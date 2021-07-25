@@ -1,0 +1,23 @@
+{
+  "name": "council-alert-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Work on https://kusama.polkassembly.io/bounty/4",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meta-dojo/council-alert-app.git"
+  },
+  "author": "meta-dojo team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/meta-dojo/council-alert-app/issues"
+  },
+  "homepage": "https://github.com/meta-dojo/council-alert-app#readme",
+  "workspaces": [
+    "workspaces/*"
+  ]
+}
