@@ -5,7 +5,9 @@
   "description": "Work on https://kusama.polkassembly.io/bounty/4",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "android": "cd workspaces/app && yarn android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
   },
   "repository": {
     "type": "git",
@@ -18,6 +20,8 @@
   },
   "homepage": "https://github.com/meta-dojo/council-alert-app#readme",
   "workspaces": [
-    "workspaces/*"
-  ]
+    "workspaces/api-server",
+    "workspaces/processor"
+  ],
+  "devDependencies": {}
 }
