@@ -4,9 +4,14 @@ interface ILoggerOption {
   message: string;
 }
 
+const _getUTCNow = (): number => {
+  return new Date().getTime();
+};
+
 // This is just a placeholder, will add more handling logic later
 const log = ({ type, errorObj, message }: ILoggerOption): void => {
-  console.log(`${type}: ${message}`, errorObj);
+  const utcNow = _getUTCNow();
+  console.log(`${type}(${utcNow}): ${message}`, errorObj);
 };
 
 log.info = (message: string, errorObj?: Error): void => {

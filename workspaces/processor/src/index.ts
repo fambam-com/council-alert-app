@@ -1,10 +1,10 @@
-import { log } from "./util";
+import Logger from "./util/Logger";
 import crawlerRun from "./Crawler";
 import parserRun from "./Parser";
 import notificationSenderRun from "./NotificationSender";
 
 (() => {
-  const _interval = 1000 * 10;
+  const _interval = 1000 * 1;
   let _finished = true;
 
   setInterval(async () => {
@@ -18,32 +18,32 @@ import notificationSenderRun from "./NotificationSender";
   }, _interval);
 })();
 
-(() => {
-  const _interval = 1000 * 3;
-  let _finished = true;
+// (() => {
+//   const _interval = 1000 * 3;
+//   let _finished = true;
 
-  setInterval(async () => {
-    if (_finished) {
-      _finished = false;
+//   setInterval(async () => {
+//     if (_finished) {
+//       _finished = false;
 
-      await parserRun();
+//       await parserRun();
 
-      _finished = true;
-    }
-  }, _interval);
-})();
+//       _finished = true;
+//     }
+//   }, _interval);
+// })();
 
-(() => {
-  const _interval = 1000 * 10;
-  let _finished = true;
+// (() => {
+//   const _interval = 1000 * 10;
+//   let _finished = true;
 
-  setInterval(async () => {
-    if (_finished) {
-      _finished = false;
+//   setInterval(async () => {
+//     if (_finished) {
+//       _finished = false;
 
-      await notificationSenderRun();
+//       await notificationSenderRun();
 
-      _finished = true;
-    }
-  }, _interval);
-})();
+//       _finished = true;
+//     }
+//   }, _interval);
+// })();
