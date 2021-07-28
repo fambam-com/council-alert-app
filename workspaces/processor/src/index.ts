@@ -3,19 +3,8 @@ import crawlerRun from "./Crawler";
 import parserRun from "./Parser";
 import notificationSenderRun from "./NotificationSender";
 
-(() => {
-  const _interval = 1000 * 1;
-  let _finished = true;
-
-  setInterval(async () => {
-    if (_finished) {
-      _finished = false;
-
-      await crawlerRun();
-
-      _finished = true;
-    }
-  }, _interval);
+(async () => {
+  await crawlerRun();
 })();
 
 // (() => {

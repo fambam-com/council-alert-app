@@ -1,13 +1,16 @@
-import { getApiInstance } from "./util/SubstrateChainHelper";
+import { getApiInstance, getBlockData } from "./util/ChainHelper";
 import Logger from "./util/Logger";
 
 const run = async (): Promise<void> => {
   Logger.info(`Crawler starts to run...`);
 
+  // TODO: Put into setting
   const api = await getApiInstance({
     chainName: `kusama`,
     endpoint: [`wss://kusama-rpc.polkadot.io/`],
   });
+
+  // This one has system.remark - `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`
 
   // Retrieve the latest header
   const lastHeader = await api.rpc.chain.getHeader();
@@ -24,16 +27,20 @@ const run = async (): Promise<void> => {
 
   const toNumber = currentNumber + gapBetween;
 
-  while (currentNumber <= toNumber) {
-    currentNumber++;
+  // while (currentNumber <= toNumber) {
+  //   currentNumber++;
 
-    // Handle error
-    const blockHash = await api.rpc.chain.getBlockHash(currentNumber);
+  //   // Handle error
+  //   const blockHash = await api.rpc.chain.getBlockHash(currentNumber);
 
-    console.log(`Block Height: ${currentNumber} - ${blockHash.toJSON()}`);
-  }
+  //   console.log(`Block Height: ${currentNumber} - ${blockHash.toJSON()}`);
+  // }
 
-  Logger.info(`Crawler finished`);
+  const blockData = await getBlockData(api, {
+    blockHash: `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`,
+  });
+
+  console.log(blockData);
 };
 
 export default run;
