@@ -10,37 +10,23 @@ const run = async (): Promise<void> => {
     endpoint: [`wss://kusama-rpc.polkadot.io/`],
   });
 
-  // This one has system.remark - `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`
+  // TESTING: This one has system.remark - `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`
 
-  // Retrieve the latest header
-  const lastHeader = await api.rpc.chain.getHeader();
+  // Subscribe to the last head
+  await api.rpc.chain.subscribeFinalizedHeads(async (blockHeader) => {
+    const blockNumber = blockHeader.number.toNumber();
 
-  // Compare last number from rpc to db record and fetch block hash within the gap
-  const lastNumber = parseInt(lastHeader.number.toString());
-  let currentNumber = 800000; // TODO: Get from DB
+    const blockData = await getBlockData(api, {
+      blockNumber,
+    });
 
-  let gapBetween = lastNumber - currentNumber;
+    Logger.info(`New block detected, number: ${blockNumber}`);
 
-  if (gapBetween > 100) {
-    gapBetween = 100;
-  }
-
-  const toNumber = currentNumber + gapBetween;
-
-  // while (currentNumber <= toNumber) {
-  //   currentNumber++;
-
-  //   // Handle error
-  //   const blockHash = await api.rpc.chain.getBlockHash(currentNumber);
-
-  //   console.log(`Block Height: ${currentNumber} - ${blockHash.toJSON()}`);
-  // }
-
-  const blockData = await getBlockData(api, {
-    blockHash: `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`,
+    // DB Operation
+    if (blockData) {
+      console.log(blockData);
+    }
   });
-
-  console.log(blockData);
 };
 
 export default run;

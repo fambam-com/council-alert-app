@@ -120,7 +120,7 @@ export const getBlockData = async (
 
     return {
       blockNumber: _blockNumber,
-      blockHash,
+      blockHash: _blockHash,
       interestedAlerts,
     };
   } catch (error) {
