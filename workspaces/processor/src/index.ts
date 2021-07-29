@@ -3,6 +3,8 @@ import crawlerRun from "./Crawler";
 import parserRun from "./Parser";
 import notificationSenderRun from "./NotificationSender";
 
+require("dotenv").config({ path: `../../.env` });
+
 (async () => {
   await crawlerRun();
 })();

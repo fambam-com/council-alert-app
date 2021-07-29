@@ -1,5 +1,6 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import Logger from "./Logger";
+
 export type ChainName = `kusama` | `polkadot`;
 
 interface BaseOption {
@@ -44,7 +45,7 @@ export const getApiInstance = async ({
   return api;
 };
 
-export type AlertRemark = {
+type AlertRemark = {
   // Fields from onchain data
   alertCouncil: boolean;
 };
