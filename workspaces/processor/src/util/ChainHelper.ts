@@ -50,13 +50,23 @@ type AlertRemark = {
   alertCouncil: boolean;
 };
 
+export type InterestedAlerts = AlertRemark & {
+  address: string;
+};
+
+export type BlockData = {
+  blockNumber: number;
+  blockHash: string;
+  interestedAlerts: Array<InterestedAlerts>;
+};
+
 export const getBlockData = async (
   api: ApiPromise,
   option: {
     blockHash?: string;
     blockNumber?: number;
   }
-) => {
+): Promise<BlockData | null> => {
   const { blockHash, blockNumber } = option;
 
   if (!blockHash && !blockNumber) {
@@ -79,7 +89,7 @@ export const getBlockData = async (
       10
     );
 
-    const interestedAlerts: Array<any> = [];
+    const interestedAlerts: Array<InterestedAlerts> = [];
 
     block.extrinsics.forEach((e) => {
       if (
@@ -121,7 +131,7 @@ export const getBlockData = async (
 
     return {
       blockNumber: _blockNumber,
-      blockHash: _blockHash,
+      blockHash: _blockHash as string,
       interestedAlerts,
     };
   } catch (error) {

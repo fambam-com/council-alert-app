@@ -1,6 +1,6 @@
 import { MongoClient, MongoClientOptions, Db } from "mongodb";
 import Logger from "./Logger";
-import { ChainName } from "./ChainHelper";
+import { ChainName, BlockData, InterestedAlerts } from "./ChainHelper";
 
 let _dbInstance: Db | null = null;
 
@@ -23,10 +23,55 @@ export const getDBInstance = async () => {
   return _dbInstance;
 };
 
-export const test = async () => {
+type AlertRemarkDB = InterestedAlerts & {
+  phase: `parser-ready` | `notification-available` | `notification-unavailable`;
+  isCouncilMember?: boolean;
+  isTCMember?: boolean;
+};
+
+type BlockDataDB = {
+  blockHash: string;
+  blockNumber: number;
+  alertRemarks: Array<AlertRemarkDB>;
+  phase: `parser-ready` | `notification-available` | `notification-unavailable`;
+};
+
+export const saveBlock = async (blockData: BlockData) => {
+  Logger.info(`Start to save new block into DB...`);
+
+  const { blockNumber, blockHash, interestedAlerts } = blockData;
+
   const db = await getDBInstance();
 
-  const record = await db.collection(`Block`).findOne();
+  const blockCollection = db.collection(`Block`);
 
-  console.log(record);
+  const existingBlock = await blockCollection.findOne({
+    $or: [{ blockHash }, { blockNumber }],
+  });
+
+  // The block with this hash or number already existed
+  if (existingBlock) {
+    Logger.warning(
+      `Block with number: ${blockNumber} or hash: ${blockHash} already existed`
+    );
+
+    // TODO: Logic to handle this case
+    return;
+  }
+
+  const blockDataDB: BlockDataDB = {
+    blockHash,
+    blockNumber,
+    phase: interestedAlerts.length
+      ? `parser-ready`
+      : `notification-unavailable`,
+    alertRemarks: interestedAlerts.map((a) => ({
+      ...a,
+      phase: `parser-ready`,
+    })),
+  };
+
+  await blockCollection.insertOne(blockDataDB);
+
+  Logger.info(`New block with number: ${blockNumber} saved`);
 };

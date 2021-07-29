@@ -1,6 +1,6 @@
 import { getApiInstance, getBlockData } from "./util/ChainHelper";
 import Logger from "./util/Logger";
-import { test } from "./util/DBOperator";
+import { saveBlock } from "./util/DBOperator";
 
 const run = async (): Promise<void> => {
   Logger.info(`Crawler starts to run...`);
@@ -25,7 +25,7 @@ const run = async (): Promise<void> => {
 
     // DB Operation
     if (blockData) {
-      test();
+      await saveBlock(blockData);
     }
   });
 };
