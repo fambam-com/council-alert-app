@@ -23,17 +23,23 @@ export const getDBInstance = async () => {
   return _dbInstance;
 };
 
-type AlertRemarkDB = InterestedAlerts & {
-  phase: `parser-ready` | `notification-available` | `notification-unavailable`;
+type AlertRemarkDTO = InterestedAlerts & {
+  status:
+    | `parser-ready`
+    | `notification-available`
+    | `notification-unavailable`;
   isCouncilMember?: boolean;
   isTCMember?: boolean;
 };
 
-type BlockDataDB = {
+type BlockDataDTO = {
   blockHash: string;
   blockNumber: number;
-  alertRemarks: Array<AlertRemarkDB>;
-  phase: `parser-ready` | `notification-available` | `notification-unavailable`;
+  alertRemarks: Array<AlertRemarkDTO>;
+  status:
+    | `parser-ready`
+    | `notification-available`
+    | `notification-unavailable`;
 };
 
 export const saveBlock = async (blockData: BlockData) => {
@@ -59,19 +65,73 @@ export const saveBlock = async (blockData: BlockData) => {
     return;
   }
 
-  const blockDataDB: BlockDataDB = {
+  const blockDataDB: BlockDataDTO = {
     blockHash,
     blockNumber,
-    phase: interestedAlerts.length
+    status: interestedAlerts.length
       ? `parser-ready`
       : `notification-unavailable`,
     alertRemarks: interestedAlerts.map((a) => ({
       ...a,
-      phase: `parser-ready`,
+      status: `parser-ready`,
     })),
   };
 
   await blockCollection.insertOne(blockDataDB);
 
   Logger.info(`New block with number: ${blockNumber} saved`);
+};
+
+type NotificationDTO = {
+  status: `ready` | `sent`;
+  alertRemarkId: string;
+  subject?: string;
+  content: string;
+  importance: `low` | `medium` | `high` | `urgent`;
+};
+
+type UserDTO = {
+  notificationToken: string;
+  notificationSetting?: any;
+  notifications: Array<NotificationDTO>;
+};
+
+export const getUserInfo = async (token: string) => {
+  Logger.info(`Start to query user by token: ${token} from DB...`);
+
+  const db = await getDBInstance();
+
+  const user = db.collection(`User`);
+
+  const existingUser = await user.findOne({ notificationToken: token });
+
+  return existingUser ? (existingUser as UserDTO) : null;
+};
+
+export const createUser = async (token: string) => {
+  Logger.info(`Start to add new user with token: ${token}...`);
+
+  const db = await getDBInstance();
+
+  const user = db.collection(`User`);
+
+  // Check for existing user first
+  const existingUser = await getUserInfo(token);
+
+  if (existingUser) {
+    Logger.info(`User existed`);
+
+    return `USER_EXISTED`;
+  }
+
+  const newUser: UserDTO = {
+    notificationToken: token,
+    notifications: [],
+  };
+
+  await user.insertOne(newUser);
+
+  Logger.info(`New user created`);
+
+  return `USER_CREATED`;
 };

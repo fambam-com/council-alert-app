@@ -1,5 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
+import { getUserInfo, createUser } from "./util/DBOperator";
+import asyncHandler from "express-async-handler";
 
 export default async () => {
   const app: Application = express();
@@ -17,11 +19,29 @@ export default async () => {
   app.post(
     `/notification/token`,
     jsonParser,
-    (request: Request, response: Response) => {
-      // console.log(request.query, request);
-      console.log(request.body);
+    async (request: Request, response: Response) => {
+      const { token } = request.body;
 
-      response.send({ token: `Token received` });
+      const user = await getUserInfo(token);
+
+      if (user) {
+        response.send(user);
+
+        return;
+      }
+
+      // Create user
+      const createResult = await createUser(token);
+
+      if (createResult === `USER_CREATED`) {
+        const createdUser = await getUserInfo(token);
+
+        response.send(createdUser);
+
+        return;
+      }
+
+      response.sendStatus(400);
     }
   );
 

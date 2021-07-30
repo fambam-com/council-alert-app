@@ -91,14 +91,18 @@ export default function App() {
 }
 
 async function onTest() {
-  const response = await axios.post(
-    `http://localhost:3000/notification/token`,
-    {
-      token: `My awesome token`,
-    }
-  );
+  try {
+    const response = await axios.post(
+      `http://localhost:3000/notification/token`,
+      {
+        token: `My awesome token`,
+      }
+    );
 
-  console.log(response.data);
+    console.log(response.data);
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/notifications
