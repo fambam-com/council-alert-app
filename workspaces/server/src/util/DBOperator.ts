@@ -1,4 +1,4 @@
-import { MongoClient, MongoClientOptions, Db } from "mongodb";
+import { MongoClient, MongoClientOptions, Db, Collection } from "mongodb";
 import Logger from "./Logger";
 import { ChainName, BlockData, InterestedAlerts } from "./ChainHelper";
 
@@ -23,24 +23,23 @@ export const getDBInstance = async () => {
   return _dbInstance;
 };
 
+export type BlockStatus =
+  | `parser-ready`
+  | `notification-available`
+  | `notification-unavailable`;
+
 type AlertRemarkDTO = InterestedAlerts & {
-  status:
-    | `parser-ready`
-    | `notification-available`
-    | `notification-unavailable`;
+  status: BlockStatus;
   isCouncilMember?: boolean;
   isTCMember?: boolean;
 };
 
-type BlockDataDTO = {
+export type BlockDataDTO = {
   chainName: ChainName;
   blockHash: string;
   blockNumber: number;
   alertRemarks: Array<AlertRemarkDTO>;
-  status:
-    | `parser-ready`
-    | `notification-available`
-    | `notification-unavailable`;
+  status: BlockStatus;
 };
 
 export const saveBlock = async (
@@ -87,8 +86,10 @@ export const saveBlock = async (
   Logger.info(`New block with number: ${blockNumber} saved`);
 };
 
+type NotificationStatus = `ready` | `sent`;
+
 type NotificationDTO = {
-  status: `ready` | `sent`;
+  status: NotificationStatus;
   alertRemarkId: string;
   subject?: string;
   content: string;
