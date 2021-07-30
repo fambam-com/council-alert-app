@@ -20,8 +20,7 @@
   },
   "homepage": "https://github.com/meta-dojo/council-alert-app#readme",
   "workspaces": [
-    "workspaces/api-server",
-    "workspaces/processor"
+    "workspaces/server"
   ],
   "devDependencies": {}
 }

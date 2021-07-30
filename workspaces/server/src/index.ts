@@ -2,8 +2,13 @@ import Logger from "./util/Logger";
 import crawlerRun from "./Crawler";
 import parserRun from "./Parser";
 import notificationSenderRun from "./NotificationSender";
+import apiRun from "./APIServer";
 
 require("dotenv").config({ path: `../../.env` });
+
+(async () => {
+  await apiRun();
+})();
 
 (async () => {
   await crawlerRun();
