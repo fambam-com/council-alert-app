@@ -2,6 +2,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import React, { useState, useEffect, useRef } from "react";
 import { Text, View, Button, Platform } from "react-native";
+import axios from "axios";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,9 +21,9 @@ export default function App() {
   const responseListener = useRef(null);
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then((token) =>
-      setExpoPushToken(token)
-    );
+    // registerForPushNotificationsAsync().then((token) =>
+    //   setExpoPushToken(token)
+    // );
 
     // This listener is fired whenever a notification is received while the app is foregrounded
     notificationListener.current =
@@ -74,6 +75,12 @@ export default function App() {
         </Text>
       </View>
       <Button
+        title="TEST"
+        onPress={async () => {
+          await onTest();
+        }}
+      />
+      <Button
         title="Press to Send Notification"
         onPress={async () => {
           await sendPushNotification(expoPushToken);
@@ -81,6 +88,17 @@ export default function App() {
       />
     </View>
   );
+}
+
+async function onTest() {
+  const response = await axios.post(
+    `http://localhost:3000/notification/token`,
+    {
+      token: `My awesome token`,
+    }
+  );
+
+  console.log(response.data);
 }
 
 // Can use this function below, OR use Expo's Push Notification Tool-> https://expo.io/notifications

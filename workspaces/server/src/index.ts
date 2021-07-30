@@ -11,7 +11,7 @@ require("dotenv").config({ path: `../../.env` });
 })();
 
 (async () => {
-  await crawlerRun();
+  // await crawlerRun();
 })();
 
 // (() => {

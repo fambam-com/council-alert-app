@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "expo": "~42.0.1",
     "expo-notifications": "~0.12.3",
     "expo-status-bar": "~1.0.4",
