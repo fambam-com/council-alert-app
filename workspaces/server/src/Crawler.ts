@@ -25,7 +25,9 @@ const run = async (): Promise<void> => {
 
     // DB Operation
     if (blockData) {
-      await saveBlock(blockData);
+      await saveBlock(blockData, {
+        chainName: `kusama`,
+      });
     }
   });
 };

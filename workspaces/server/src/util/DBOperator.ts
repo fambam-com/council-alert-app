@@ -33,6 +33,7 @@ type AlertRemarkDTO = InterestedAlerts & {
 };
 
 type BlockDataDTO = {
+  chainName: ChainName;
   blockHash: string;
   blockNumber: number;
   alertRemarks: Array<AlertRemarkDTO>;
@@ -42,7 +43,10 @@ type BlockDataDTO = {
     | `notification-unavailable`;
 };
 
-export const saveBlock = async (blockData: BlockData) => {
+export const saveBlock = async (
+  blockData: BlockData,
+  option: { chainName: ChainName }
+) => {
   Logger.info(`Start to save new block into DB...`);
 
   const { blockNumber, blockHash, interestedAlerts } = blockData;
@@ -66,6 +70,7 @@ export const saveBlock = async (blockData: BlockData) => {
   }
 
   const blockDataDB: BlockDataDTO = {
+    chainName: option.chainName,
     blockHash,
     blockNumber,
     status: interestedAlerts.length
