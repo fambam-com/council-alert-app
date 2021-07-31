@@ -74,6 +74,16 @@ export const getBlockData = async (
     throw new Error("Either Block Hash or Block Number needs to have value");
   }
 
+  // Get Council and TC members
+  // TODO: Put into a global var and update less frequently
+  const councilMembers = (
+    await api.query.council.members()
+  ).toJSON() as Array<string>;
+
+  const tcMembers = (
+    await api.query.technicalCommittee.members()
+  ).toJSON() as Array<string>;
+
   let _blockHash = blockHash;
 
   if (!blockHash && blockNumber) {
@@ -103,6 +113,12 @@ export const getBlockData = async (
           method: { args },
         } = e;
 
+        const ADDR = (address.toJSON() as { id: string }).id;
+
+        if (![...councilMembers, ...tcMembers].includes(ADDR)) {
+          return;
+        }
+
         // Validate args has the desired AlertType bfore validating the account
         args.forEach((a) => {
           const alertRemark = a as any as AlertRemark;
@@ -110,7 +126,7 @@ export const getBlockData = async (
           let interested = true;
 
           // TODO: Add more validation here
-          if (alertRemark.alertCouncil === undefined) {
+          if (!alertRemark.alertCouncil) {
             interested = false;
           }
 
@@ -125,10 +141,9 @@ export const getBlockData = async (
               message: alertRemark.message,
             };
 
-            // Address validation will be done in parser
             interestedAlerts.push({
               ...alertRemarkData,
-              address: (address.toJSON() as { id: string }).id,
+              address: ADDR,
             });
           }
         });
