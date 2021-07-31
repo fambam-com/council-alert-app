@@ -28,11 +28,7 @@ export type BlockStatus =
   | `notification-available`
   | `notification-unavailable`;
 
-type AlertRemarkDTO = InterestedAlert & {
-  status: BlockStatus;
-  isCouncilMember?: boolean;
-  isTCMember?: boolean;
-};
+type AlertRemarkDTO = InterestedAlert & {};
 
 export type BlockDataDTO = {
   chainName: ChainName;
@@ -77,7 +73,6 @@ export const saveBlock = async (
       : `notification-unavailable`,
     alertRemarks: interestedAlerts.map((a) => ({
       ...a,
-      status: `parser-ready`,
     })),
   };
 
@@ -88,8 +83,11 @@ export const saveBlock = async (
 
 type NotificationStatus = `ready` | `sent`;
 
-type NotificationDTO = {
+export type NotificationDTO = {
+  chainName: ChainName;
   status: NotificationStatus;
+  blockNumber: number;
+  blockHash: string;
   alertRemarkId: string;
   subject?: string;
   content: string;

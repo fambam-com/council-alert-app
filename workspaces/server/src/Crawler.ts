@@ -10,6 +10,10 @@ import { saveBlock, getDBInstance } from "./util/DBOperator";
 const run = async (): Promise<void> => {
   Logger.info(`Crawler starts to run...`);
 
+  // await __mockData();
+
+  // return;
+
   // TODO: Put into setting
   const api = await getApiInstance({
     chainName: `kusama`,
@@ -65,23 +69,21 @@ const __mockData = async () => {
   const validAddrs = [...councilMembers, ...tcMembers];
 
   const timmer = setInterval(async () => {
-    if (counter <= 0) {
-      clearInterval(timmer);
+    // if (counter <= 0) {
+    //   clearInterval(timmer);
 
-      return;
-    }
+    //   return;
+    // }
 
-    counter--;
+    // counter--;
 
     const alerts: Array<InterestedAlert> = [];
 
-    for (let i = 0; i < getRandomInt(0, 3); i++) {
+    for (let i = 0; i < getRandomInt(1, 5); i++) {
       const alert: InterestedAlert = {
-        alertCouncil: !!getRandomInt(0, 1),
+        alertCouncil: true,
         message: `Random Message ${getRandomInt(0, 100)}`,
-        address: getRandomInt(0, 2)
-          ? validAddrs[getRandomInt(0, validAddrs.length - 1)]
-          : `Invalid ADDR`,
+        address: validAddrs[getRandomInt(0, validAddrs.length - 1)],
       };
 
       alerts.push(alert);

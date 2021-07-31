@@ -53,6 +53,8 @@ type AlertRemark = {
 
 export type InterestedAlert = AlertRemark & {
   address: string;
+  isCouncilMember?: boolean;
+  isTCMember?: boolean;
 };
 
 export type BlockData = {
@@ -141,10 +143,18 @@ export const getBlockData = async (
               message: alertRemark.message,
             };
 
-            interestedAlerts.push({
+            const alerts: InterestedAlert = {
               ...alertRemarkData,
               address: ADDR,
-            });
+            };
+
+            if (councilMembers.includes(ADDR)) {
+              alerts.isCouncilMember = true;
+            } else {
+              alerts.isTCMember = true;
+            }
+
+            interestedAlerts.push(alerts);
           }
         });
       }
