@@ -48,16 +48,17 @@ export const getApiInstance = async ({
 type AlertRemark = {
   // Fields from onchain data
   alertCouncil: boolean;
+  message: string;
 };
 
-export type InterestedAlerts = AlertRemark & {
+export type InterestedAlert = AlertRemark & {
   address: string;
 };
 
 export type BlockData = {
   blockNumber: number;
   blockHash: string;
-  interestedAlerts: Array<InterestedAlerts>;
+  interestedAlerts: Array<InterestedAlert>;
 };
 
 export const getBlockData = async (
@@ -89,7 +90,7 @@ export const getBlockData = async (
       10
     );
 
-    const interestedAlerts: Array<InterestedAlerts> = [];
+    const interestedAlerts: Array<InterestedAlert> = [];
 
     block.extrinsics.forEach((e) => {
       if (
@@ -113,10 +114,15 @@ export const getBlockData = async (
             interested = false;
           }
 
+          if (alertRemark.message === undefined) {
+            interested = false;
+          }
+
           if (interested) {
             // TODO: Construct the alert remark data
             const alertRemarkData: AlertRemark = {
               alertCouncil: alertRemark.alertCouncil,
+              message: alertRemark.message,
             };
 
             // Address validation will be done in parser

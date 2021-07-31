@@ -4,7 +4,7 @@ interface ILoggerOption {
   message: string;
 }
 
-const _getUTCNow = (): number => {
+export const _getUTCNow = (): number => {
   return new Date().getTime();
 };
 

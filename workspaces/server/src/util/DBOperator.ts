@@ -1,6 +1,6 @@
 import { MongoClient, MongoClientOptions, Db, Collection } from "mongodb";
 import Logger from "./Logger";
-import { ChainName, BlockData, InterestedAlerts } from "./ChainHelper";
+import { ChainName, BlockData, InterestedAlert } from "./ChainHelper";
 
 let _dbInstance: Db | null = null;
 
@@ -28,7 +28,7 @@ export type BlockStatus =
   | `notification-available`
   | `notification-unavailable`;
 
-type AlertRemarkDTO = InterestedAlerts & {
+type AlertRemarkDTO = InterestedAlert & {
   status: BlockStatus;
   isCouncilMember?: boolean;
   isTCMember?: boolean;

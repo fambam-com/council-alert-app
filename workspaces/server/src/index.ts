@@ -6,28 +6,28 @@ import apiRun from "./APIServer";
 
 require("dotenv").config({ path: `../../.env` });
 
-(async () => {
-  await apiRun();
-})();
+// (async () => {
+//   await apiRun();
+// })();
 
 (async () => {
   // await crawlerRun();
 })();
 
-(() => {
-  const _interval = 1000 * 3;
-  let _finished = true;
+// (() => {
+//   const _interval = 1000 * 3;
+//   let _finished = true;
 
-  setInterval(async () => {
-    if (_finished) {
-      _finished = false;
+//   setInterval(async () => {
+//     if (_finished) {
+//       _finished = false;
 
-      await parserRun();
+//       await parserRun();
 
-      _finished = true;
-    }
-  }, _interval);
-})();
+//       _finished = true;
+//     }
+//   }, _interval);
+// })();
 
 // (() => {
 //   const _interval = 1000 * 10;

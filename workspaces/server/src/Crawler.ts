@@ -1,6 +1,11 @@
-import { getApiInstance, getBlockData } from "./util/ChainHelper";
-import Logger from "./util/Logger";
-import { saveBlock } from "./util/DBOperator";
+import {
+  BlockData,
+  getApiInstance,
+  getBlockData,
+  InterestedAlert,
+} from "./util/ChainHelper";
+import Logger, { _getUTCNow } from "./util/Logger";
+import { saveBlock, getDBInstance } from "./util/DBOperator";
 
 const run = async (): Promise<void> => {
   Logger.info(`Crawler starts to run...`);
@@ -33,3 +38,78 @@ const run = async (): Promise<void> => {
 };
 
 export default run;
+
+const __mockData = async () => {
+  let counter = 10;
+
+  const db = await getDBInstance();
+
+  const blockDB = db.collection(`Block`);
+
+  await blockDB.deleteMany({});
+
+  const api = await getApiInstance({
+    chainName: `kusama`,
+    endpoint: [`wss://kusama-rpc.polkadot.io/`],
+  });
+
+  // Get Council and TC members
+  const councilMembers = (
+    await api.query.council.members()
+  ).toJSON() as Array<string>;
+
+  const tcMembers = (
+    await api.query.technicalCommittee.members()
+  ).toJSON() as Array<string>;
+
+  const validAddrs = [...councilMembers, ...tcMembers];
+
+  const timmer = setInterval(async () => {
+    if (counter <= 0) {
+      clearInterval(timmer);
+
+      return;
+    }
+
+    counter--;
+
+    const alerts: Array<InterestedAlert> = [];
+
+    for (let i = 0; i < getRandomInt(0, 3); i++) {
+      const alert: InterestedAlert = {
+        alertCouncil: !!getRandomInt(0, 1),
+        message: `Random Message ${getRandomInt(0, 100)}`,
+        address: getRandomInt(0, 2)
+          ? validAddrs[getRandomInt(0, validAddrs.length - 1)]
+          : `Invalid ADDR`,
+      };
+
+      alerts.push(alert);
+    }
+
+    const utcNow = _getUTCNow();
+
+    const blockData: BlockData = {
+      blockNumber: utcNow,
+      blockHash: utcNow.toString(),
+      interestedAlerts: alerts,
+    };
+
+    await saveBlock(blockData, {
+      chainName: `kusama`,
+    });
+  }, 1000 * 6);
+};
+
+/**
+ * Returns a random integer between min (inclusive) and max (inclusive).
+ * The value is no lower than min (or the next integer greater than min
+ * if min isn't an integer) and no greater than max (or the next integer
+ * lower than max if max isn't an integer).
+ * Using Math.round() will give you a non-uniform distribution!
+ */
+function getRandomInt(min: number, max: number) {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
