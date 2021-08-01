@@ -21,9 +21,9 @@ export default function App() {
   const responseListener = useRef(null);
 
   useEffect(() => {
-    // registerForPushNotificationsAsync().then((token) =>
-    //   setExpoPushToken(token)
-    // );
+    registerForPushNotificationsAsync().then((token) =>
+      setExpoPushToken(token)
+    );
 
     // This listener is fired whenever a notification is received while the app is foregrounded
     notificationListener.current =
@@ -142,7 +142,22 @@ async function registerForPushNotificationsAsync() {
       return;
     }
     token = (await Notifications.getExpoPushTokenAsync()).data;
+
     console.log(token);
+    // console.log(token.toString());
+
+    try {
+      const response = await axios.post(
+        `http://222.154.104.164/notification/token`,
+        {
+          token: token.toString(),
+        }
+      );
+
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   } else {
     alert("Must use physical device for Push Notifications");
   }

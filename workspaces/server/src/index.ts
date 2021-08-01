@@ -11,7 +11,7 @@ require("dotenv").config({ path: `../../.env` });
 })();
 
 (async () => {
-  await crawlerRun();
+  // await crawlerRun();
 })();
 
 (() => {
@@ -29,17 +29,17 @@ require("dotenv").config({ path: `../../.env` });
   }, _interval);
 })();
 
-// (() => {
-//   const _interval = 1000 * 10;
-//   let _finished = true;
+(() => {
+  const _interval = 1000 * 10;
+  let _finished = true;
 
-//   setInterval(async () => {
-//     if (_finished) {
-//       _finished = false;
+  setInterval(async () => {
+    if (_finished) {
+      _finished = false;
 
-//       await notificationSenderRun();
+      // await notificationSenderRun();
 
-//       _finished = true;
-//     }
-//   }, _interval);
-// })();
+      _finished = true;
+    }
+  }, _interval);
+})();

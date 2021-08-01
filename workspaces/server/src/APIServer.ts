@@ -1,6 +1,7 @@
 import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
-import { getUserInfo, createUser } from "./util/DBOperator";
+import { getUserInfo, createUser, userIsActive } from "./util/DBOperator";
+import { ObjectId } from "bson";
 
 export default async () => {
   const app: Application = express();
@@ -24,6 +25,8 @@ export default async () => {
       const user = await getUserInfo(token);
 
       if (user) {
+        await userIsActive(user._id as ObjectId);
+
         response.send(user);
 
         return;

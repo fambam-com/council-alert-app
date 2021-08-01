@@ -1,5 +1,11 @@
-import { MongoClient, MongoClientOptions, Db, Collection } from "mongodb";
-import Logger from "./Logger";
+import {
+  MongoClient,
+  MongoClientOptions,
+  Db,
+  Collection,
+  ObjectId,
+} from "mongodb";
+import Logger, { _getUTCNow } from "./Logger";
 import { ChainName, BlockData, InterestedAlert } from "./ChainHelper";
 
 let _dbInstance: Db | null = null;
@@ -31,6 +37,7 @@ export type BlockStatus =
 type AlertRemarkDTO = InterestedAlert & {};
 
 export type BlockDataDTO = {
+  _id?: ObjectId;
   chainName: ChainName;
   blockHash: string;
   blockNumber: number;
@@ -84,6 +91,7 @@ export const saveBlock = async (
 type NotificationStatus = `ready` | `sent`;
 
 export type NotificationDTO = {
+  _id?: ObjectId;
   chainName: ChainName;
   status: NotificationStatus;
   blockNumber: number;
@@ -94,9 +102,11 @@ export type NotificationDTO = {
   importance: `low` | `medium` | `high` | `urgent`;
 };
 
-type UserDTO = {
+export type UserDTO = {
+  _id?: ObjectId;
   notificationToken: string;
   notificationSetting?: any;
+  lastActiveTime: number;
   notifications: Array<NotificationDTO>;
 };
 
@@ -110,6 +120,16 @@ export const getUserInfo = async (token: string) => {
   const existingUser = await user.findOne({ notificationToken: token });
 
   return existingUser ? (existingUser as UserDTO) : null;
+};
+
+export const userIsActive = async (_id: ObjectId) => {
+  Logger.info(`Update user last active time to UTC now`);
+
+  const db = await getDBInstance();
+
+  const user = db.collection(`User`) as Collection<UserDTO>;
+
+  await user.updateOne({ _id }, { $set: { lastActiveTime: _getUTCNow() } });
 };
 
 export const createUser = async (token: string) => {
@@ -130,6 +150,7 @@ export const createUser = async (token: string) => {
 
   const newUser: UserDTO = {
     notificationToken: token,
+    lastActiveTime: _getUTCNow(),
     notifications: [],
   };
 
