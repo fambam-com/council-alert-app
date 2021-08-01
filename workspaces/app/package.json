@@ -8,6 +8,7 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "~1.15.0",
     "axios": "^0.21.1",
     "expo": "~42.0.1",
     "expo-notifications": "~0.12.3",
