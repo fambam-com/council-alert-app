@@ -22,7 +22,7 @@ require("dotenv").config({ path: `../../.env` });
     if (_finished) {
       _finished = false;
 
-      await parserRun();
+      // await parserRun();
 
       _finished = true;
     }

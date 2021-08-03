@@ -104,22 +104,39 @@ export type NotificationDTO = {
 
 export type UserDTO = {
   _id?: ObjectId;
+  id: string;
   notificationToken: string;
   notificationSetting?: any;
   lastActiveTime: number;
   notifications: Array<NotificationDTO>;
 };
 
-export const getUserInfo = async (token: string) => {
-  Logger.info(`Start to query user by token: ${token} from DB...`);
+export const getUserInfo = async ({ id }: { id: string }) => {
+  Logger.info(`Start to query user by id: ${id} from DB...`);
 
   const db = await getDBInstance();
 
   const user = db.collection(`User`);
 
-  const existingUser = await user.findOne({ notificationToken: token });
+  const existingUser = await user.findOne({ id: id });
 
   return existingUser ? (existingUser as UserDTO) : null;
+};
+
+export const updateToken = async ({
+  token,
+  _id,
+}: {
+  token: string;
+  _id: ObjectId;
+}) => {
+  Logger.info(`Update user token`);
+
+  const db = await getDBInstance();
+
+  const user = db.collection(`User`) as Collection<UserDTO>;
+
+  await user.updateOne({ _id }, { $set: { notificationToken: token } });
 };
 
 export const userIsActive = async (_id: ObjectId) => {
@@ -132,23 +149,21 @@ export const userIsActive = async (_id: ObjectId) => {
   await user.updateOne({ _id }, { $set: { lastActiveTime: _getUTCNow() } });
 };
 
-export const createUser = async (token: string) => {
+export const createUser = async ({
+  id,
+  token,
+}: {
+  id: string;
+  token: string;
+}) => {
   Logger.info(`Start to add new user with token: ${token}...`);
 
   const db = await getDBInstance();
 
   const user = db.collection(`User`);
 
-  // Check for existing user first
-  const existingUser = await getUserInfo(token);
-
-  if (existingUser) {
-    Logger.info(`User existed`);
-
-    return `USER_EXISTED`;
-  }
-
   const newUser: UserDTO = {
+    id,
     notificationToken: token,
     lastActiveTime: _getUTCNow(),
     notifications: [],

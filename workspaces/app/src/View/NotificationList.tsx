@@ -13,6 +13,7 @@ export default function NotificationList() {
     (async () => {
       const response = await $post(`/user`, {
         token: notificationToken,
+        id,
       });
 
       if (response) {

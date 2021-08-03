@@ -1,8 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
-
 import Constants from "expo-constants";
 
-const API_URI = Constants.API_URI;
+const API_URI = Constants.manifest?.extra?.API_URI;
 
 export const $get = async (
   endpoint: string,
@@ -19,11 +18,15 @@ export const $get = async (
 
 export const $post = async (
   endpoint: string,
-  data: any,
+  data?: any,
   config?: AxiosRequestConfig | undefined
 ) => {
   try {
-    const response = await axios.post(`${API_URI}${endpoint}`, data, config);
+    const response = await axios.post(
+      `http://localhost:3000${endpoint}`,
+      data,
+      config
+    );
 
     return response;
   } catch (error) {

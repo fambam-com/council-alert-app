@@ -1,6 +1,11 @@
 import express, { Application, Request, Response } from "express";
 import bodyParser from "body-parser";
-import { getUserInfo, createUser, userIsActive } from "./util/DBOperator";
+import {
+  getUserInfo,
+  createUser,
+  userIsActive,
+  updateToken,
+} from "./util/DBOperator";
 import { ObjectId } from "bson";
 
 export default async () => {
@@ -17,14 +22,21 @@ export default async () => {
   });
 
   app.post(
-    `/notification/token`,
+    `/user`,
     jsonParser,
     async (request: Request, response: Response) => {
-      const { token } = request.body;
+      const { token, id } = request.body;
 
-      const user = await getUserInfo(token);
+      const user = await getUserInfo({ id });
 
       if (user) {
+        if (user.notificationToken !== token) {
+          await updateToken({
+            _id: user._id as ObjectId,
+            token,
+          });
+        }
+
         await userIsActive(user._id as ObjectId);
 
         response.send(user);
@@ -33,10 +45,10 @@ export default async () => {
       }
 
       // Create user
-      const createResult = await createUser(token);
+      const createResult = await createUser({ id, token });
 
       if (createResult === `USER_CREATED`) {
-        const createdUser = await getUserInfo(token);
+        const createdUser = await getUserInfo({ id });
 
         response.send(createdUser);
 
