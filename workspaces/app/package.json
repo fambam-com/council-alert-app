@@ -10,7 +10,9 @@
   "dependencies": {
     "@react-native-async-storage/async-storage": "~1.15.0",
     "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
     "expo": "~42.0.1",
+    "expo-crypto": "~9.2.0",
     "expo-notifications": "~0.12.3",
     "expo-random": "~11.2.0",
     "expo-secure-store": "~10.2.0",
