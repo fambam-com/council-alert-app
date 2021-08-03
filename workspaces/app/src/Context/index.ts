@@ -1,9 +1,12 @@
 import React, { createContext, useContext } from "react";
+import { UserDTO } from "../../../server/src/util/DBOperator";
 
 export type STATE_TYPE = {
+  setState: (values: any) => void;
   id: string;
+  notificationToken: string;
   loadingMetaData: boolean;
-  setState: (NEW_STATE: STATE_TYPE) => void;
+  user: UserDTO;
 };
 
 export const STATE: STATE_TYPE = {

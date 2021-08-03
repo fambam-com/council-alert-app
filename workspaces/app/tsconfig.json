@@ -4,6 +4,11 @@
     "strict": true,
     "rootDir": "./src"
   },
+  "references": [
+    {
+      "path": "../server"
+    }
+  ],
   "exclude": [
     "node_modules",
     "build",

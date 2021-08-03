@@ -1,14 +1,14 @@
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useEffect, useContext, useRef } from "react";
 import { View, StyleSheet, Platform } from "react-native";
 import { Button, Text } from "react-native-elements";
-import axios from "axios";
 import StateContext from "./Context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Random from "expo-random";
 import * as Crypto from "expo-crypto";
 import { Subscription } from "@unimodules/core";
+import { NotificationList } from "./View";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -40,11 +40,12 @@ export default function App() {
     }
 
     return id;
-
-    // state.setState({ ...state, id: storedId, loadingMetaData: false });
   };
 
   const getNotificationToken = async () => {
+    // TESTING DATA
+    return `ExponentPushToken[oZI8lHPGif70IEgG-u1T31`;
+
     let notificationToken = await AsyncStorage.getItem("notificationToken");
 
     if (!notificationToken) {
@@ -88,8 +89,6 @@ export default function App() {
 
       const token = await getNotificationToken();
 
-      console.log(Constants.API_URI);
-
       if (!token) {
         alert("Notification is required for this app!");
         return;
@@ -109,20 +108,11 @@ export default function App() {
           console.log(response);
         });
 
-      // TODO: Call api to get/add token and use info
-
-      // try {
-      //   const response = await axios.post(
-      //     `http://222.154.104.164/notification/token`,
-      //     {
-      //       token: token.toString(),
-      //     }
-      //   );
-
-      //   console.log(response.data);
-      // } catch (error) {
-      //   console.log(error);
-      // }
+      state.setState({
+        id,
+        notificationToken: token,
+        loadingMetaData: false,
+      });
     })();
 
     return () => {
@@ -142,7 +132,7 @@ export default function App() {
     return (
       <View style={page.container}>
         <View>
-          <Text>Loading Data...</Text>
+          <Text>Loading Configuration...</Text>
         </View>
       </View>
     );
@@ -150,7 +140,7 @@ export default function App() {
 
   return (
     <View style={page.container}>
-      <Button title="Hello Wrold"></Button>
+      <NotificationList></NotificationList>
     </View>
   );
 }
