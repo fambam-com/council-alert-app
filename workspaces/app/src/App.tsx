@@ -44,7 +44,7 @@ export default function App() {
 
   const getNotificationToken = async () => {
     // TESTING DATA
-    return `ExponentPushToken[oZI8lHPGif70IEgG-u1T31`;
+    return `ExponentPushToken[oZI8lHf70IEgG-u1T31]`;
 
     let notificationToken = await AsyncStorage.getItem("notificationToken");
 

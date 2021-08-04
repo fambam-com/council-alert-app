@@ -88,7 +88,7 @@ export const saveBlock = async (
   Logger.info(`New block with number: ${blockNumber} saved`);
 };
 
-type NotificationStatus = `ready` | `sent`;
+export type NotificationStatus = `ready` | `sent` | `error`;
 
 export type NotificationDTO = {
   _id: ObjectId;
@@ -100,6 +100,7 @@ export type NotificationDTO = {
   subject?: string;
   content: string;
   importance: `low` | `medium` | `high` | `urgent`;
+  createdTime: number;
 };
 
 export type UserDTO = {

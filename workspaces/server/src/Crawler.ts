@@ -49,8 +49,10 @@ const __mockData = async () => {
   const db = await getDBInstance();
 
   const blockDB = db.collection(`Block`);
+  const notificationDB = db.collection(`Notification`);
 
   await blockDB.deleteMany({});
+  await notificationDB.deleteMany({});
 
   const api = await getApiInstance({
     chainName: `kusama`,

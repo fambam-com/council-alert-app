@@ -1,5 +1,10 @@
 import Logger from "./util/Logger";
-import { getDBInstance, NotificationDTO, UserDTO } from "./util/DBOperator";
+import {
+  getDBInstance,
+  NotificationDTO,
+  UserDTO,
+  NotificationStatus,
+} from "./util/DBOperator";
 import { Collection, ObjectId } from "mongodb";
 import { Expo, ExpoPushMessage } from "expo-server-sdk";
 
@@ -34,28 +39,60 @@ const run = async (): Promise<void> => {
   // TODO: Filter out inacitve users
   const userCursor = userCollection
     .find({})
-    .project({ notificationToken: 1, _id: 1 });
+    .project({ notificationToken: 1, _id: 1, notifications: 1 });
 
   const users = await userCursor.toArray();
 
+  Logger.info(`There are ${await userCursor.count()} active users`);
+
   users.forEach(async (u) => {
-    await send(u.notificationToken as string, notifications);
+    let success = false;
+
+    Logger.info(`Sending notifications to user with _id: ${u._id}`);
+
+    try {
+      await send(u.notificationToken as string, notifications);
+
+      success = true;
+    } catch (error) {
+      Logger.error(error.message, error);
+
+      success = false;
+    }
+
+    // Insert into user.notifications with the sent/error status
+    userCollection.updateOne(
+      {
+        _id: u._id as ObjectId,
+      },
+      {
+        $set: {
+          notifications: [
+            ...notifications.map((n) => ({
+              ...n,
+              status: (success ? `sent` : `error`) as NotificationStatus,
+            })),
+            ...(u.notifications as Array<NotificationDTO>),
+          ],
+        },
+      }
+    );
   });
 
-  await userCursor.forEach(
-    (u: { notificationToken: string; _id: ObjectId }) => {
-      notifications.forEach(async (n) => {
-        await userCollection.updateOne(
-          { _id: u._id },
-          {
-            $push: {
-              notifications: n,
-            },
-          }
-        );
-      });
-    }
-  );
+  // await userCursor.forEach(
+  //   (u: { notificationToken: string; _id: ObjectId }) => {
+  //     notifications.forEach(async (n) => {
+  //       await userCollection.updateOne(
+  //         { _id: u._id },
+  //         {
+  //           $push: {
+  //             notifications: n,
+  //           },
+  //         }
+  //       );
+  //     });
+  //   }
+  // );
 
   await notificationCollection.updateMany(
     {
@@ -97,17 +134,12 @@ const send = async (token: string, notifications: Array<NotificationDTO>) => {
     // different strategies you could use. A simple one is to send one chunk at a
     // time, which nicely spreads the load out over time:
     for (let chunk of chunks) {
-      try {
-        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-        console.log(ticketChunk);
-        tickets.push(...ticketChunk);
-        // NOTE: If a ticket contains an error code in ticket.details.error, you
-        // must handle it appropriately. The error codes are listed in the Expo
-        // documentation:
-        // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
-      } catch (error) {
-        console.error(error);
-      }
+      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+      tickets.push(...ticketChunk);
+      // NOTE: If a ticket contains an error code in ticket.details.error, you
+      // must handle it appropriately. The error codes are listed in the Expo
+      // documentation:
+      // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
     }
   })();
 };

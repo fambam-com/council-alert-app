@@ -1,5 +1,5 @@
 import { getApiInstance, getBlockData } from "./util/ChainHelper";
-import Logger from "./util/Logger";
+import Logger, { _getUTCNow } from "./util/Logger";
 import {
   getDBInstance,
   BlockDataDTO,
@@ -47,16 +47,18 @@ const run = async (): Promise<void> => {
     notifications = [
       ...notifications,
       ...alertRemarks.map(
-        (a): NotificationDTO => ({
-          chainName,
-          status: `ready`,
-          blockNumber,
-          blockHash,
-          alertRemarkId: _id.valueOf().toString(),
-          importance: `medium`,
-          subject: `Alert Message`,
-          content: a.message,
-        })
+        (a) =>
+          ({
+            chainName,
+            status: `ready`,
+            blockNumber,
+            blockHash,
+            alertRemarkId: _id.valueOf().toString(),
+            importance: `medium`,
+            subject: `Alert Message`,
+            content: a.message,
+            createdTime: _getUTCNow(),
+          } as NotificationDTO)
       ),
     ];
 
