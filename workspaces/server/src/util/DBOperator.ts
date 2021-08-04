@@ -121,6 +121,12 @@ export const getUserInfo = async ({ id }: { id: string }) => {
 
   const existingUser = await user.findOne({ id: id });
 
+  if (existingUser) {
+    (existingUser as UserDTO).notifications = (
+      existingUser as UserDTO
+    ).notifications.sort((a, b) => b.createdTime - a.createdTime);
+  }
+
   return existingUser ? (existingUser as UserDTO) : null;
 };
 

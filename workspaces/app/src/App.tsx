@@ -142,6 +142,13 @@ export default function App() {
     <View style={{ flex: 1 }}>
       <Header
         centerComponent={{ text: "MY TITLE", style: { color: "#fff" } }}
+        rightComponent={{
+          icon: "refresh",
+          color: "#fff",
+          onPress: () => {
+            state.getNotification(state.id);
+          },
+        }}
       />
       <NotificationList></NotificationList>
     </View>

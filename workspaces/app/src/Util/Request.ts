@@ -5,10 +5,14 @@ const API_URI = Constants.manifest?.extra?.API_URI;
 
 export const $get = async (
   endpoint: string,
+  params?: any,
   config?: AxiosRequestConfig | undefined
 ) => {
   try {
-    const response = await axios.get(`${API_URI}${endpoint}`, config);
+    const response = await axios.get(`http://localhost:3000${endpoint}`, {
+      params,
+      ...(config || {}),
+    });
 
     return response;
   } catch (error) {

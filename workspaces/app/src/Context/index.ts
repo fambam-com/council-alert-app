@@ -1,8 +1,9 @@
 import React, { createContext, useContext } from "react";
-import { UserDTO } from "../../../server/src/util/DBOperator";
+import { NotificationDTO, UserDTO } from "../../../server/src/util/DBOperator";
 
 export type STATE_TYPE = {
   setState: (values: any) => void;
+  getNotification: (id: string) => Promise<Array<NotificationDTO>>;
   id: string;
   notificationToken: string;
   loadingMetaData: boolean;

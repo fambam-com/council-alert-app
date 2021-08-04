@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from "express";
+import express, { Application, request, Request, Response } from "express";
 import bodyParser from "body-parser";
 import {
   getUserInfo,
@@ -56,6 +56,20 @@ export default async () => {
       }
 
       response.sendStatus(400);
+    }
+  );
+
+  app.get(
+    `/user/notification`,
+    jsonParser,
+    async (request: Request, response: Response) => {
+      const { id } = request.query;
+
+      const user = await getUserInfo({ id: id as string });
+
+      response.send(user?.notifications);
+
+      return;
     }
   );
 
