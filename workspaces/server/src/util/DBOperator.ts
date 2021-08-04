@@ -91,7 +91,7 @@ export const saveBlock = async (
 type NotificationStatus = `ready` | `sent`;
 
 export type NotificationDTO = {
-  _id?: ObjectId;
+  _id: ObjectId;
   chainName: ChainName;
   status: NotificationStatus;
   blockNumber: number;
@@ -103,7 +103,7 @@ export type NotificationDTO = {
 };
 
 export type UserDTO = {
-  _id?: ObjectId;
+  _id: ObjectId;
   id: string;
   notificationToken: string;
   notificationSetting?: any;
@@ -162,7 +162,7 @@ export const createUser = async ({
 
   const user = db.collection(`User`);
 
-  const newUser: UserDTO = {
+  const newUser = {
     id,
     notificationToken: token,
     lastActiveTime: _getUTCNow(),

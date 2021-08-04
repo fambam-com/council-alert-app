@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useContext, useRef } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import { Button, Text } from "react-native-elements";
+import { Header, Text } from "react-native-elements";
 import StateContext from "./Context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Random from "expo-random";
@@ -44,7 +44,7 @@ export default function App() {
 
   const getNotificationToken = async () => {
     // TESTING DATA
-    // return `ExponentPushToken[oZI8lHPGif70IEgG-u1T31`;
+    return `ExponentPushToken[oZI8lHPGif70IEgG-u1T31`;
 
     let notificationToken = await AsyncStorage.getItem("notificationToken");
 
@@ -139,7 +139,10 @@ export default function App() {
   }
 
   return (
-    <View style={page.container}>
+    <View style={{ flex: 1 }}>
+      <Header
+        centerComponent={{ text: "MY TITLE", style: { color: "#fff" } }}
+      />
       <NotificationList></NotificationList>
     </View>
   );
