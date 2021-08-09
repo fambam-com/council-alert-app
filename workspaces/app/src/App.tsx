@@ -160,8 +160,6 @@ export default function App() {
   const renderFilterComponent = () => {
     const { displayName } = state.currentChain || {};
 
-    console.log(state.availableChains);
-
     return { text: displayName || `loading...`, style: { color: "#fff" } };
   };
 
