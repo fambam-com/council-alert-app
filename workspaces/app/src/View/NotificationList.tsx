@@ -1,5 +1,5 @@
-import React, { useEffect, useContext } from "react";
-import { View, StyleSheet, FlatList } from "react-native";
+import React, { useRef, useState, useEffect, useContext } from "react";
+import { View, StyleSheet, FlatList, AppState } from "react-native";
 import { ListItem, Text, Button } from "react-native-elements";
 import StateContext from "../Context";
 import { $post } from "../Util/Request";
@@ -8,7 +8,19 @@ import { NotificationDTO } from "../../../server/src/util/DBOperator";
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
     useContext(StateContext);
-  // const [loading, setLoading] = useState(true)
+
+  const appState = useRef(AppState.currentState);
+
+  const appStateListener = (nextAppState: any) => {
+    if (
+      appState.current.match(/inactive|background/) &&
+      nextAppState === "active"
+    ) {
+      getNotification(id);
+    }
+
+    appState.current = nextAppState;
+  };
 
   useEffect(() => {
     (async () => {
@@ -25,6 +37,12 @@ export default function NotificationList() {
         });
       }
     })();
+
+    AppState.addEventListener("change", appStateListener);
+
+    return () => {
+      AppState.removeEventListener("change", appStateListener);
+    };
   }, []);
 
   if (!user) {

@@ -14,7 +14,7 @@ require("dotenv").config({ path: `../../.env` });
 (async () => {
   const chainInfos = await getAllChaininfo();
 
-  // chainInfos.map((ci) => crawlerRun(ci));
+  chainInfos.map((ci) => crawlerRun(ci));
 })();
 
 (() => {
@@ -25,7 +25,7 @@ require("dotenv").config({ path: `../../.env` });
     if (_finished) {
       _finished = false;
 
-      // await parserRun();
+      await parserRun();
 
       _finished = true;
     }
@@ -40,7 +40,7 @@ require("dotenv").config({ path: `../../.env` });
     if (_finished) {
       _finished = false;
 
-      // await notificationSenderRun();
+      await notificationSenderRun();
 
       _finished = true;
     }
