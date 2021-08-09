@@ -3,6 +3,7 @@ import crawlerRun from "./Crawler";
 import parserRun from "./Parser";
 import notificationSenderRun from "./NotificationSender";
 import apiRun from "./APIServer";
+import { getAllChaininfo } from "./endpoint";
 
 require("dotenv").config({ path: `../../.env` });
 
@@ -11,6 +12,10 @@ require("dotenv").config({ path: `../../.env` });
 })();
 
 (async () => {
+  const chainInfos = await getAllChaininfo();
+
+  chainInfos.map((ci) => crawlerRun(ci));
+
   // await crawlerRun();
 })();
 

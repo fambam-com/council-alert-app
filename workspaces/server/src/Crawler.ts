@@ -6,18 +6,19 @@ import {
 } from "./util/ChainHelper";
 import Logger, { _getUTCNow } from "./util/Logger";
 import { saveBlock, getDBInstance } from "./util/DBOperator";
+import { ChainInfo } from "./endpoint";
 
-const run = async (): Promise<void> => {
+const run = async (chainInfo: ChainInfo): Promise<void> => {
   Logger.info(`Crawler starts to run...`);
 
-  // await __mockData();
+  // await __mockData(chainInfo);
 
   // return;
 
   // TODO: Put into setting
   const api = await getApiInstance({
-    chainName: `kusama`,
-    endpoint: [`wss://kusama-rpc.polkadot.io/`],
+    chainName: chainInfo.chainName,
+    endpoint: chainInfo.endpoint,
   });
 
   // TESTING: This one has system.remark - `0x5c74a36bd4311637991701f8d759a2ae757ac5c480044534bd056c94ab3b7443`
@@ -35,7 +36,7 @@ const run = async (): Promise<void> => {
     // DB Operation
     if (blockData) {
       await saveBlock(blockData, {
-        chainName: `kusama`,
+        chainName: chainInfo.chainName,
       });
     }
   });
@@ -43,7 +44,7 @@ const run = async (): Promise<void> => {
 
 export default run;
 
-const __mockData = async () => {
+const __mockData = async (chainInfo: ChainInfo) => {
   let counter = 10;
 
   const db = await getDBInstance();
@@ -55,8 +56,8 @@ const __mockData = async () => {
   await notificationDB.deleteMany({});
 
   const api = await getApiInstance({
-    chainName: `kusama`,
-    endpoint: [`wss://kusama-rpc.polkadot.io/`],
+    chainName: chainInfo.chainName,
+    endpoint: chainInfo.endpoint,
   });
 
   // Get Council and TC members
@@ -100,7 +101,7 @@ const __mockData = async () => {
     };
 
     await saveBlock(blockData, {
-      chainName: `kusama`,
+      chainName: chainInfo.chainName,
     });
   }, 1000 * 6);
 };

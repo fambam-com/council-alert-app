@@ -23,6 +23,7 @@ export const getChaininfo = async (
 export const getAllChaininfo = async (): Promise<Array<ChainInfo>> => {
   // Add more as required
   const chainNames: Array<ChainName> = [`kusama`];
+  // const chainNames: Array<ChainName> = [`kusama`, `polkadot`];
 
   const infos = await Promise.all(chainNames.map((n) => getChaininfo(n)));
 
