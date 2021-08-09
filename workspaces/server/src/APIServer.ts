@@ -6,6 +6,7 @@ import {
   userIsActive,
   updateToken,
 } from "./util/DBOperator";
+import Logger from "./util/Logger";
 import { ObjectId } from "bson";
 import { getAllChaininfo } from "./endpoint";
 
@@ -73,6 +74,8 @@ export default async () => {
     jsonParser,
     async (request: Request, response: Response) => {
       const { id } = request.query;
+
+      Logger.info(`Fetching notification of user id: ${id}`);
 
       const user = await getUserInfo({ id: id as string });
 

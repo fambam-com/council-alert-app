@@ -1,13 +1,13 @@
 import React, { useEffect, useContext } from "react";
 import { View, StyleSheet, FlatList } from "react-native";
-import { ListItem, Text } from "react-native-elements";
+import { ListItem, Text, Button } from "react-native-elements";
 import StateContext from "../Context";
-import { useState } from "react";
 import { $post } from "../Util/Request";
 import { NotificationDTO } from "../../../server/src/util/DBOperator";
 
 export default function NotificationList() {
-  const { id, notificationToken, user, setState } = useContext(StateContext);
+  const { id, notificationToken, user, setState, getNotification } =
+    useContext(StateContext);
   // const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -58,6 +58,38 @@ export default function NotificationList() {
     );
   };
 
+  const renderEmptyNotification = () => {
+    return (
+      <View
+        style={{
+          flex: 1,
+          display: `flex`,
+          alignItems: "center",
+          justifyContent: "space-around",
+          marginTop: 30,
+        }}
+      >
+        <View>
+          <Text>You have no notification...</Text>
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            marginTop: 20,
+          }}
+        >
+          <Button
+            title="Refresh"
+            onPress={() => {
+              getNotification(id);
+            }}
+          />
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View
       style={{
@@ -71,6 +103,7 @@ export default function NotificationList() {
         keyExtractor={(n) => n._id.valueOf().toString()}
         data={notifications}
         renderItem={renderNotification}
+        ListEmptyComponent={renderEmptyNotification()}
       ></FlatList>
     </View>
   );
