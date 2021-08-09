@@ -14,9 +14,7 @@ require("dotenv").config({ path: `../../.env` });
 (async () => {
   const chainInfos = await getAllChaininfo();
 
-  chainInfos.map((ci) => crawlerRun(ci));
-
-  // await crawlerRun();
+  // chainInfos.map((ci) => crawlerRun(ci));
 })();
 
 (() => {
