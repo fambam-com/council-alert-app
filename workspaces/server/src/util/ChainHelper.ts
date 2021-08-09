@@ -1,7 +1,6 @@
 import { ApiPromise, WsProvider } from "@polkadot/api";
 import Logger from "./Logger";
-
-export type ChainName = `kusama` | `polkadot`;
+import { ChainName } from "../endpoint";
 
 interface BaseOption {
   endpoint: Array<string>;

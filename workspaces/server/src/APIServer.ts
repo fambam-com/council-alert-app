@@ -7,6 +7,7 @@ import {
   updateToken,
 } from "./util/DBOperator";
 import { ObjectId } from "bson";
+import { getAllChaininfo } from "./endpoint";
 
 export default async () => {
   const app: Application = express();
@@ -19,6 +20,14 @@ export default async () => {
 
   app.get(`/`, (request: Request, response: Response) => {
     response.send(`Council alert app is running...`);
+  });
+
+  app.get(`/meta-data`, async (request: Request, response: Response) => {
+    const infos = await getAllChaininfo();
+
+    response.send(infos);
+
+    return;
   });
 
   app.post(

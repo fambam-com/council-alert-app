@@ -6,7 +6,8 @@ import {
   ObjectId,
 } from "mongodb";
 import Logger, { _getUTCNow } from "./Logger";
-import { ChainName, BlockData, InterestedAlert } from "./ChainHelper";
+import { BlockData, InterestedAlert } from "./ChainHelper";
+import { ChainName } from "../endpoint";
 
 let _dbInstance: Db | null = null;
 

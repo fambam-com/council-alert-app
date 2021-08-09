@@ -9,6 +9,7 @@ import * as Random from "expo-random";
 import * as Crypto from "expo-crypto";
 import { Subscription } from "@unimodules/core";
 import { NotificationList } from "./View";
+import { $get } from "../src/Util/Request";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -83,11 +84,25 @@ export default function App() {
     return notificationToken;
   };
 
+  const getMetaData = async () => {
+    const response = await $get(`/meta-data`);
+
+    if (response) {
+      const { data: infos } = response;
+
+      return infos;
+    }
+
+    return null;
+  };
+
   useEffect(() => {
     (async () => {
       const id = await getId();
 
       const token = await getNotificationToken();
+
+      const infos = await getMetaData();
 
       if (!token) {
         alert("Notification is required for this app!");
@@ -112,6 +127,8 @@ export default function App() {
         id,
         notificationToken: token,
         loadingMetaData: false,
+        availableChains: infos,
+        currentChain: infos[0],
       });
     })();
 
@@ -138,10 +155,20 @@ export default function App() {
     );
   }
 
+  // TODO 1: Display avaialble chain options(probably include 'ALL' option)
+  // TODO 2: Apply additional filter here e.g importance
+  const renderFilterComponent = () => {
+    const { displayName } = state.currentChain || {};
+
+    console.log(state.availableChains);
+
+    return { text: displayName || `loading...`, style: { color: "#fff" } };
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <Header
-        centerComponent={{ text: "MY TITLE", style: { color: "#fff" } }}
+        centerComponent={renderFilterComponent()}
         rightComponent={{
           icon: "refresh",
           color: "#fff",
