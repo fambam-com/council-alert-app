@@ -19,8 +19,5 @@
     "url": "https://github.com/meta-dojo/council-alert-app/issues"
   },
   "homepage": "https://github.com/meta-dojo/council-alert-app#readme",
-  "workspaces": [
-    "workspaces/server"
-  ],
   "devDependencies": {}
 }

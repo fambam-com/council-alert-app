@@ -1,8 +1,8 @@
 {
-  "name": "server",
+  "name": "council-alert-app-service",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/Module.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
     "build": "tsc -p .",
