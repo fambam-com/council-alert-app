@@ -9,7 +9,7 @@ import * as Random from "expo-random";
 import * as Crypto from "expo-crypto";
 import { Subscription } from "@unimodules/core";
 import { NotificationList } from "./View";
-import { $get } from "../src/Util/Request";
+import { $post } from "../src/Util/Request";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -85,7 +85,7 @@ export default function App() {
   };
 
   const getMetaData = async () => {
-    const response = await $get(`/meta-data`);
+    const response = await $post(`/meta-data`);
 
     if (response) {
       const { data: infos } = response;

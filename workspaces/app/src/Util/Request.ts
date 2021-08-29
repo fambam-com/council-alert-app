@@ -27,6 +27,23 @@ export const $post = async (
   data?: any,
   config?: AxiosRequestConfig | undefined
 ) => {
+  const operation = (endpoint || ``).replace(`/`, ``);
+
+  return await _post(
+    ``,
+    {
+      ...(data || {}),
+      operation,
+    },
+    config
+  );
+};
+
+const _post = async (
+  endpoint: string,
+  data?: any,
+  config?: AxiosRequestConfig | undefined
+) => {
   try {
     const response = await axios.post(`${API_URI}${endpoint}`, data, config);
 
