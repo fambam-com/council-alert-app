@@ -33,11 +33,11 @@ export type NotificationStatus = `ready` | `sent` | `error`;
 
 export type NotificationDTO = {
   _id: ObjectId;
+  _key: string;
+  _type: `system.remark` | `proposal`;
   chainName: ChainName;
   status: NotificationStatus;
-  blockNumber: number;
-  blockHash: string;
-  alertRemarkId: string;
+  block_number: number;
   subject?: string;
   content: string;
   importance: `low` | `medium` | `high` | `urgent`;
@@ -122,4 +122,24 @@ export const createUser = async ({
   Logger.info(`New user created`);
 
   return `USER_CREATED`;
+};
+
+export const saveEvents = async (events) => {
+  // const keys = events.map((e) => e._key);
+
+  const db = await getDBInstance();
+
+  const eventCollection = db.collection(`Event`);
+
+  for (const e of events) {
+    const duplicateEvent = await eventCollection.findOne({
+      _key: e._key,
+    });
+
+    if (!duplicateEvent) {
+      await eventCollection.insertOne({
+        ...e,
+      });
+    }
+  }
 };
