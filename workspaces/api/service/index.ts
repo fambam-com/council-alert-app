@@ -25,7 +25,7 @@ export const handleApi = async (body: any) => {
     case `user/notification`:
       return await getUserNotification(body);
     case `system-admin`:
-      return await processData(body);
+      return await processData(body, { saveEventOnly: true });
     default:
       return await handleHeartbeat();
   }
@@ -93,7 +93,10 @@ export const workerDo = async () => {
   await processData({ srEvents, proposalEvents });
 };
 
-export const processData = async ({ srEvents = [], proposalEvents = [] }) => {
+export const processData = async (
+  { srEvents = [], proposalEvents = [] },
+  options = { saveEventOnly: false }
+) => {
   const events = [
     ...srEvents.map((e) => ({
       ...e,
@@ -116,7 +119,11 @@ export const processData = async ({ srEvents = [], proposalEvents = [] }) => {
 
   await saveEvents(events);
 
-  await senderDo();
+  const { saveEventOnly } = options;
+
+  if (!saveEventOnly) {
+    await senderDo();
+  }
 };
 
 const filterEvents = (event) => {
