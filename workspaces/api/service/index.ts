@@ -121,6 +121,10 @@ export const workerDo = async () => {
 
   logger.info(`call from workerDo`);
 
+  logger.info(`system remark event count: ${(srEvents || []).length}`);
+
+  logger.info(`proposal event count: ${(proposalEvents || []).length}`);
+
   await processData({ srEvents, proposalEvents });
 };
 
@@ -328,4 +332,81 @@ const sendNotification = async (
       // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
     }
   })();
+};
+
+export const cleanup = async () => {
+  const CLEANUP_SETTING = {
+    EventCleanupDays: 7,
+    InactiveUserCleanupDays: 30,
+  };
+
+  const db = await getDBInstance();
+
+  const eventCollection = db.collection(`Event`);
+
+  logger.info(`start to cleanup Event collection`);
+
+  const eventCleanupTime = new Date();
+  eventCleanupTime.setDate(
+    eventCleanupTime.getDate() - CLEANUP_SETTING.EventCleanupDays
+  );
+
+  logger.info(`EventCleanupTime before: ${eventCleanupTime}`);
+
+  const eventDeletedResult = await eventCollection.deleteMany({
+    status: `sent`,
+    createdTime: { $lt: eventCleanupTime.getTime() },
+  });
+
+  logger.info(
+    `there are ${eventDeletedResult.deletedCount} Event records deleted`
+  );
+
+  logger.info(`start to cleanup User collection`);
+
+  const userCleanupTime = new Date();
+  userCleanupTime.setDate(
+    userCleanupTime.getDate() - CLEANUP_SETTING.InactiveUserCleanupDays
+  );
+
+  logger.info(`UserCleanupTime before: ${userCleanupTime}`);
+
+  const userCollection = db.collection(`User`);
+
+  const userDeletedResult = await userCollection.deleteMany({
+    lastActiveTime: { $lt: userCleanupTime.getTime() },
+  });
+
+  logger.info(
+    `there are ${userDeletedResult.deletedCount} User records deleted`
+  );
+
+  logger.info(`start to cleanup User.Notifications`);
+
+  const activeUsersCusor = userCollection.find({});
+
+  const activeUsers = await activeUsersCusor.toArray();
+
+  activeUsers.forEach((u) => {
+    try {
+      userCollection.updateOne(
+        {
+          _id: u._id as ObjectId,
+        },
+        {
+          $set: {
+            notifications: [
+              ...u.notifications.filter(
+                (n) =>
+                  n.createdTime > eventCleanupTime.getTime() &&
+                  n.status === `sent`
+              ),
+            ],
+          },
+        }
+      );
+    } catch (error) {
+      logger.error(error);
+    }
+  });
 };
