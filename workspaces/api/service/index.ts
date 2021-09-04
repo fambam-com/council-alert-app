@@ -14,6 +14,8 @@ import axios from "axios";
 import { Collection, ObjectId } from "mongodb";
 import { Expo, ExpoPushMessage } from "expo-server-sdk";
 
+const logger = require("pino")();
+
 export const handleApi = async (body: any) => {
   const { operation } = body || {};
 
@@ -25,7 +27,7 @@ export const handleApi = async (body: any) => {
     case `user/notification`:
       return await getUserNotification(body);
     case `system-admin`:
-      console.log(`call from system-admin`);
+      logger.info(`call from system-admin`);
 
       return await processData(body, { saveEventOnly: true });
     default:
@@ -77,8 +79,33 @@ const getUserNotification = async ({ id }: { id: string }) => {
   return user?.notifications;
 };
 
+interface PolkastatsApiResult<T> {
+  status: boolean;
+  message: string;
+  data: T;
+}
+
+interface SystemRemark {
+  block_number: number;
+  extrinsic_hash: string;
+  signer: string;
+  remark: string;
+  datetime: string;
+}
+
+interface ProposalEvent {
+  block_number: number;
+  section: string;
+  method: string;
+  data: Array<any>;
+  datetime: string;
+}
+
 export const workerDo = async () => {
-  const [srReponse, proposalReponse] = await Promise.all([
+  const [srReponse, proposalReponse]: [
+    { data: PolkastatsApiResult<Array<SystemRemark>> },
+    { data: PolkastatsApiResult<Array<ProposalEvent>> }
+  ] = await Promise.all([
     axios.get(`${process.env.POLKASTATS_SYSTEM_REMARK_URI}`),
     axios.get(`${process.env.POLKASTATS_COUNCIL_EVENT_URI}`),
   ]);
@@ -92,7 +119,7 @@ export const workerDo = async () => {
     },
   ] = [srReponse, proposalReponse];
 
-  console.log(`call from workerDo`);
+  logger.info(`call from workerDo`);
 
   await processData({ srEvents, proposalEvents });
 };
@@ -101,7 +128,7 @@ export const processData = async (
   { srEvents = [], proposalEvents = [] },
   options = {}
 ) => {
-  console.log(`processData data call: options: ${JSON.stringify(options)}`);
+  logger.info(`processData data call: options: ${JSON.stringify(options)}`);
 
   const events = [
     ...srEvents.map((e) => ({
@@ -109,16 +136,7 @@ export const processData = async (
       _type: `system.remark`,
       _key: `${e.block_number}-${e.extrinsic_hash}`,
     })),
-    ...proposalEvents.map(({ block_number, data, datetime }) => ({
-      block_number,
-      datetime,
-      _type: `proposal`,
-      _key: `${block_number}-${data[2]}`,
-      _account: data[0],
-      _proposalIndex: data[1],
-      _proposal: data[2],
-      _memberCount: data[3],
-    })),
+    ...proposalEvents.map(getProposalEvent),
   ]
     .filter((e) => filterEvents(e))
     .map((e) => processEvent(e));
@@ -130,6 +148,27 @@ export const processData = async (
   if (!saveEventOnly) {
     await senderDo();
   }
+};
+
+const getProposalEvent = (e: ProposalEvent) => {
+  const { block_number, data, method } = e;
+
+  let proposalHash = data[0];
+
+  if (method.toLowerCase() === `proposed`) {
+    proposalHash = data[2];
+  }
+
+  if (method.toLowerCase() === `voted`) {
+    proposalHash = data[1];
+  }
+
+  return {
+    ...e,
+    _type: `proposal`,
+    _key: `${block_number}-${proposalHash}`,
+    _proposalHash: proposalHash,
+  };
 };
 
 const filterEvents = (event) => {
@@ -147,7 +186,7 @@ const filterEvents = (event) => {
         return false;
       }
     } catch (e) {
-      console.log(e);
+      logger.info(e);
 
       return false;
     }
@@ -159,15 +198,18 @@ const filterEvents = (event) => {
 const processEvent = (e) => {
   let _remark = undefined;
   let content = undefined;
+  let subject = `Alert Message`;
 
   if (e._type === `system.remark`) {
     _remark = JSON.parse(e.remark);
     content = _remark.message;
+    subject = `System Remark`;
   }
 
   // TODO: proposal
   if (!content && e._type === `proposal`) {
-    content = `Proposal action: ${e._proposal}`;
+    content = `${e.method}: ${e._proposalHash}`;
+    subject = `Proposal Action`;
   }
 
   return {
@@ -176,9 +218,8 @@ const processEvent = (e) => {
     chainName: `kusama`,
     createdTime: Date.parse(e.datetime),
     importance: `medium`,
-    subject: `Alert Message`,
+    subject,
     content,
-    // _remark,
   };
 };
 
