@@ -160,7 +160,19 @@ const getProposalEvent = (e: ProposalEvent) => {
   let proposalHash = data[0];
 
   if (method.toLowerCase() === `proposed`) {
-    proposalHash = data[2];
+    if (Array.isArray(data)) {
+      proposalHash = data[2];
+    } else if (typeof data === "string") {
+      try {
+        proposalHash = JSON.parse(data)[2];
+      } catch (error) {
+        logger.error(
+          `proposed proposal event is not an array. Error happened when parsing`
+        );
+
+        proposalHash = data[2];
+      }
+    }
   }
 
   if (method.toLowerCase() === `voted`) {
@@ -212,7 +224,7 @@ const processEvent = (e) => {
 
   // TODO: proposal
   if (!content && e._type === `proposal`) {
-    content = `${e.method}: ${e._proposalHash}`;
+    content = `Proposal ${e.method}: ${e._proposalHash}`;
     subject = `Proposal Action`;
   }
 
