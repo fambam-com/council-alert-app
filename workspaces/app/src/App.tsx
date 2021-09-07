@@ -149,7 +149,7 @@ export default function App() {
     return (
       <View style={page.container}>
         <View>
-          <Text>Loading Configuration...</Text>
+          <Text>Loading...</Text>
         </View>
       </View>
     );

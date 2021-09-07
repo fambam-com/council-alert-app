@@ -88,7 +88,7 @@ export default function NotificationList() {
         }}
       >
         <View>
-          <Text>You have no notification...</Text>
+          <Text>Only display notifications within 7 days</Text>
         </View>
 
         <View
