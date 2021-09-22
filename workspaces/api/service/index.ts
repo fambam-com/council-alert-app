@@ -240,12 +240,18 @@ const processEvent = (e) => {
     subject = `Proposal Action`;
   }
 
+  const importance = e.importance || e.level || `medium`;
+
+  if (importance === `urgent`) {
+    subject = `(URGENT)${subject}`;
+  }
+
   return {
     ...e,
     status: `ready`,
     chainName: `kusama`,
     createdTime: Date.parse(e.datetime),
-    importance: e.importance || `medium`,
+    importance: importance,
     subject,
     content,
   };
