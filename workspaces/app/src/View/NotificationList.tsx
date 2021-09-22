@@ -1,15 +1,30 @@
 import React, { useRef, useState, useEffect, useContext } from "react";
-import { View, StyleSheet, FlatList, AppState } from "react-native";
-import { ListItem, Text, Button } from "react-native-elements";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  AppState,
+  TouchableHighlight,
+} from "react-native";
+import { ListItem, Text, Button, Badge } from "react-native-elements";
 import StateContext from "../Context";
 import { $post } from "../Util/Request";
 import { NotificationDTO } from "../../../server/src/util/DBOperator";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import DetailModal from "./DetailModal";
 
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
     useContext(StateContext);
+
+  const [detailModalInfo, setDetailModalInfo] = useState({
+    detailModalVisible: false,
+    notification: undefined,
+  } as {
+    detailModalVisible: boolean;
+    notification?: NotificationDTO;
+  });
 
   const appState = useRef(AppState.currentState);
 
@@ -68,24 +83,48 @@ export default function NotificationList() {
 
   const { notifications } = user;
 
+  const onPressItem = (notification: NotificationDTO) => {
+    setDetailModalInfo({
+      detailModalVisible: true,
+      notification,
+    });
+  };
+
   const renderNotification = ({ item: n }: { item: NotificationDTO }) => {
     const timeDiff = new Date().getTime() - n.createdTime;
     const timeDiffStr = millisecondsToStr(timeDiff);
 
+    const isUrgent = n.importance === `urgent`;
+
+    let subject = n.subject || ``;
+
+    if (isUrgent) {
+      subject = subject?.replace("(URGENT)", "");
+    }
+
     return (
-      <ListItem bottomDivider>
-        <ListItem.Content>
-          <View style={styles.subtitleView}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: `grey` }}>{n.subject}</Text>
+      <TouchableHighlight onPress={() => onPressItem(n)}>
+        <ListItem bottomDivider>
+          <ListItem.Content>
+            <View style={styles.subtitleView}>
+              <View style={{ flex: 2, flexDirection: `row` }}>
+                <Text style={{ color: `grey` }}>{subject}</Text>
+                {isUrgent && (
+                  <Badge
+                    badgeStyle={{ marginLeft: 3 }}
+                    status="error"
+                    value="URGENT"
+                  />
+                )}
+              </View>
+              <View style={{ flex: 1, flexDirection: `row-reverse` }}>
+                <Text style={{ color: `grey` }}>{timeDiffStr}</Text>
+              </View>
             </View>
-            <View style={{ flex: 1, flexDirection: `row-reverse` }}>
-              <Text style={{ color: `grey` }}>{timeDiffStr}</Text>
-            </View>
-          </View>
-          <ListItem.Title>{n.content}</ListItem.Title>
-        </ListItem.Content>
-      </ListItem>
+            <ListItem.Title>{n.content}</ListItem.Title>
+          </ListItem.Content>
+        </ListItem>
+      </TouchableHighlight>
     );
   };
 
@@ -153,6 +192,17 @@ export default function NotificationList() {
         renderItem={renderNotification}
         ListEmptyComponent={renderEmptyNotification()}
       ></FlatList>
+
+      <DetailModal
+        visible={detailModalInfo.detailModalVisible}
+        notification={detailModalInfo.notification}
+        hideModal={() => {
+          setDetailModalInfo({
+            detailModalVisible: false,
+            notification: undefined,
+          });
+        }}
+      ></DetailModal>
     </View>
   );
 }

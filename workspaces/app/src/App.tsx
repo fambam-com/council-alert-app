@@ -2,7 +2,7 @@ import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import React, { useEffect, useContext, useRef } from "react";
 import { View, StyleSheet, Platform } from "react-native";
-import { Header, Text } from "react-native-elements";
+import { Header, Text, Image, Icon } from "react-native-elements";
 import StateContext from "./Context";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Random from "expo-random";
@@ -10,6 +10,8 @@ import * as Crypto from "expo-crypto";
 import { Subscription } from "@unimodules/core";
 import { NotificationList } from "./View";
 import { $post } from "../src/Util/Request";
+
+const kusamaLogo = require("../assets/KUSAMA_1.png");
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -161,20 +163,42 @@ export default function App() {
   const renderFilterComponent = () => {
     const { displayName } = state.currentChain || {};
 
-    return { text: displayName || `loading...`, style: { color: "#fff" } };
+    return (
+      <Image source={kusamaLogo} style={{ width: 200, height: 50 }}></Image>
+    );
   };
 
   return (
     <View style={{ flex: 1 }}>
       <Header
+        backgroundColor={`black`}
         centerComponent={renderFilterComponent()}
-        rightComponent={{
-          icon: "refresh",
-          color: "#fff",
-          onPress: () => {
-            state.getNotification(state.id);
-          },
-        }}
+        // rightComponent={{
+        //   icon: "refresh",
+        //   color: "#fff",
+        //   onPress: () => {
+        //     state.getNotification(state.id);
+        //   },
+        // }}
+        rightComponent={
+          <View
+            style={{
+              display: `flex`,
+              flex: 1,
+              justifyContent: `center`,
+              paddingRight: 5,
+            }}
+          >
+            <Icon
+              name="refresh"
+              color="#fff"
+              size={30}
+              onPress={() => {
+                state.getNotification(state.id);
+              }}
+            ></Icon>
+          </View>
+        }
       />
       <NotificationList></NotificationList>
     </View>
