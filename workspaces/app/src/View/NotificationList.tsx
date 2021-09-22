@@ -5,6 +5,7 @@ import StateContext from "../Context";
 import { $post } from "../Util/Request";
 import { NotificationDTO } from "../../../server/src/util/DBOperator";
 import * as Device from "expo-device";
+import * as Notifications from "expo-notifications";
 
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
@@ -135,6 +136,15 @@ export default function NotificationList() {
         renderItem={renderNotification}
         ListEmptyComponent={renderEmptyNotification()}
       ></FlatList>
+
+      {/* <Button
+        title="TEST"
+        onPress={() => {
+          const content = { title: "I am a one, hasty notification." };
+
+          Notifications.scheduleNotificationAsync({ content, trigger: null });
+        }}
+      ></Button> */}
     </View>
   );
 }
