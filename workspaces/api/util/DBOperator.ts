@@ -100,9 +100,11 @@ export const userIsActive = async (_id: ObjectId) => {
 export const createUser = async ({
   id,
   token,
+  deviceInfo,
 }: {
   id: string;
   token: string;
+  deviceInfo: {};
 }) => {
   Logger.info(`Start to add new user with token: ${token}...`);
 
@@ -115,6 +117,7 @@ export const createUser = async ({
     notificationToken: token,
     lastActiveTime: _getUTCNow(),
     notifications: [],
+    ...(deviceInfo || {}),
   };
 
   await user.insertOne(newUser);

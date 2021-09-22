@@ -45,7 +45,16 @@ const getMetaData = async () => {
   return infos;
 };
 
-const handleUserInfo = async ({ token, id }: { token: string; id: string }) => {
+const handleUserInfo = async ({
+  token,
+  id,
+  operation,
+  ...restInfo
+}: {
+  token: string;
+  id: string;
+  operation: string;
+}) => {
   const user = await getUserInfo({ id });
 
   if (user) {
@@ -62,7 +71,7 @@ const handleUserInfo = async ({ token, id }: { token: string; id: string }) => {
   }
 
   // Create user
-  const createResult = await createUser({ id, token });
+  const createResult = await createUser({ id, token, deviceInfo: restInfo });
 
   if (createResult === `USER_CREATED`) {
     const createdUser = await getUserInfo({ id });
