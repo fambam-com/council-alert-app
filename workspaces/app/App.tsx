@@ -4,6 +4,7 @@ import App from "./src/App";
 import LocalApp from "./src/Local";
 import StateContext, { STATE, STATE_TYPE } from "./src/Context";
 import { $post } from "./src/Util/Request";
+import * as Notifications from "expo-notifications";
 
 export default () => {
   // return <LocalApp></LocalApp>;
@@ -28,6 +29,9 @@ export default () => {
         notifications: notifications,
       },
     });
+
+    // Reset badge count
+    Notifications.setBadgeCountAsync(0);
 
     return notifications;
   };
