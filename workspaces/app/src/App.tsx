@@ -14,8 +14,8 @@ import { $post } from "../src/Util/Request";
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
   }),
 });
 
@@ -113,7 +113,7 @@ export default function App() {
       notificationListener.current =
         Notifications.addNotificationReceivedListener((notification) => {
           // Doesn't do much now
-          console.log(notification);
+          // console.log(notification);
         });
 
       // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)

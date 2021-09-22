@@ -4,6 +4,7 @@ import { ListItem, Text, Button } from "react-native-elements";
 import StateContext from "../Context";
 import { $post } from "../Util/Request";
 import { NotificationDTO } from "../../../server/src/util/DBOperator";
+import * as Device from "expo-device";
 
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
@@ -22,9 +23,20 @@ export default function NotificationList() {
     appState.current = nextAppState;
   };
 
+  const getDeviceInfo = () => {
+    return {
+      isDevice: Device.isDevice,
+      brand: Device.brand,
+      manufacturer: Device.manufacturer,
+      modelName: Device.modelName,
+      deviceName: Device.deviceName,
+    };
+  };
+
   useEffect(() => {
     (async () => {
       const response = await $post(`/user`, {
+        ...getDeviceInfo(),
         token: notificationToken,
         id,
       });
