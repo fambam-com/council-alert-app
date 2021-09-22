@@ -112,9 +112,7 @@ export default function App() {
       // This listener is fired whenever a notification is received while the app is foregrounded
       notificationListener.current =
         Notifications.addNotificationReceivedListener((notification) => {
-          // Doesn't do much now
-          console.log(`Received`);
-          console.log(notification);
+          state.getNotification(id);
         });
 
       // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)

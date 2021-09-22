@@ -89,6 +89,21 @@ export default function NotificationList() {
     );
   };
 
+  const _testBtn = () => {
+    return (
+      <View>
+        <Button
+          title="TEST"
+          onPress={() => {
+            const content = { title: "I am a one, hasty notification." };
+
+            Notifications.scheduleNotificationAsync({ content, trigger: null });
+          }}
+        ></Button>
+      </View>
+    );
+  };
+
   const renderEmptyNotification = () => {
     return (
       <View
@@ -116,6 +131,8 @@ export default function NotificationList() {
               getNotification(id);
             }}
           />
+
+          {/* {_testBtn()} */}
         </View>
       </View>
     );
@@ -136,15 +153,6 @@ export default function NotificationList() {
         renderItem={renderNotification}
         ListEmptyComponent={renderEmptyNotification()}
       ></FlatList>
-
-      {/* <Button
-        title="TEST"
-        onPress={() => {
-          const content = { title: "I am a one, hasty notification." };
-
-          Notifications.scheduleNotificationAsync({ content, trigger: null });
-        }}
-      ></Button> */}
     </View>
   );
 }
