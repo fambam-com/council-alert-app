@@ -29,7 +29,10 @@ export const handleApi = async (body: any) => {
     case `system-admin`:
       logger.info(`call from system-admin`);
 
-      return await processData(body, { saveEventOnly: true });
+      return await processData(body, {
+        saveEventOnly:
+          body.saveEventOnly !== undefined ? body.saveEventOnly : true,
+      });
     default:
       return await handleHeartbeat();
   }
@@ -242,7 +245,7 @@ const processEvent = (e) => {
     status: `ready`,
     chainName: `kusama`,
     createdTime: Date.parse(e.datetime),
-    importance: `medium`,
+    importance: e.importance || `medium`,
     subject,
     content,
   };
@@ -268,15 +271,20 @@ const senderDo = async () => {
   // TODO: Filter out inacitve users
   const userCursor = userCollection
     .find({})
-    .project({ notificationToken: 1, _id: 1, notifications: 1 });
+    .project({ notificationToken: 1, _id: 1, notifications: 1, id: 1 });
 
   const users = await userCursor.toArray();
 
   users.forEach(async (u) => {
     let success = false;
 
+    // Filter out events
+    const _events = events.filter(
+      (e) => !Array.isArray(e.userId) || e.userId.includes(u.id)
+    );
+
     try {
-      await sendNotification(u.notificationToken as string, events);
+      await sendNotification(u.notificationToken as string, _events);
 
       success = true;
     } catch (error) {
@@ -291,7 +299,7 @@ const senderDo = async () => {
       {
         $set: {
           notifications: [
-            ...events.map((n) => ({
+            ..._events.map((n) => ({
               ...n,
               status: (success ? `sent` : `error`) as NotificationStatus,
             })),
@@ -331,6 +339,8 @@ const sendNotification = async (
   const messages: Array<ExpoPushMessage> = notifications.map((n) => ({
     to: token,
     body: n.content,
+    title: n.subject,
+    priority: n.importance === `urgent` ? `high` : `default`,
   }));
 
   // The Expo push notification service accepts batches of notifications so

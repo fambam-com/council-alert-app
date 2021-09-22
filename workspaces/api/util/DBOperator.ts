@@ -40,8 +40,9 @@ export type NotificationDTO = {
   block_number: number;
   subject?: string;
   content: string;
-  importance: `low` | `medium` | `high` | `urgent`;
+  importance: `medium` | `urgent`;
   createdTime: number;
+  userId?: Array<string>;
 };
 
 export type UserDTO = {
