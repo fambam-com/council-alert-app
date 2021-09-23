@@ -1,13 +1,17 @@
-import React from "react";
+import React, { useState } from "react";
 import { StyleSheet, Dimensions, View } from "react-native";
 import { NotificationDTO } from "../../../server/src/util/DBOperator";
 import { ListItem, Text, Button, Badge } from "react-native-elements";
 
 export default function NotificationRow({
   item: n,
+  setSnoozeModalInfo,
 }: {
   item: NotificationDTO;
+  setSnoozeModalInfo: any;
 }) {
+  const [key, setKey] = useState(n._id.valueOf().toString());
+
   const timeDiff = new Date().getTime() - n.createdTime;
   const timeDiffStr = millisecondsToStr(timeDiff);
 
@@ -23,6 +27,7 @@ export default function NotificationRow({
 
   return (
     <ListItem.Swipeable
+      key={key}
       onPress={() => {}}
       bottomDivider
       // leftContent={
@@ -35,7 +40,13 @@ export default function NotificationRow({
       rightContent={
         <Button
           onPress={() => {
-            console.log(`Hello`);
+            // Workaround: reset/recenter this swipeable row
+            setKey(key + 1);
+
+            setSnoozeModalInfo({
+              snoozeModalVisible: true,
+              notification: n,
+            });
           }}
           title="Snooze"
           icon={{ name: "snooze", color: "white" }}

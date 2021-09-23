@@ -7,20 +7,21 @@ import { NotificationDTO } from "../../../server/src/util/DBOperator";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import NotificationRow from "./NotificationRow";
+import SnoozeModal from "./SnoozeModal";
 
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
     useContext(StateContext);
 
-  const [detailModalInfo, setDetailModalInfo] = useState({
-    detailModalVisible: false,
+  const appState = useRef(AppState.currentState);
+
+  const [snoozeModalInfo, setSnoozeModalInfo] = useState({
+    snoozeModalVisible: null,
     notification: undefined,
   } as {
-    detailModalVisible: boolean;
+    snoozeModalVisible: boolean | null;
     notification?: NotificationDTO;
   });
-
-  const appState = useRef(AppState.currentState);
 
   const appStateListener = (nextAppState: any) => {
     if (
@@ -76,13 +77,6 @@ export default function NotificationList() {
   }
 
   const { notifications } = user;
-
-  const onPressItem = (notification: NotificationDTO) => {
-    setDetailModalInfo({
-      detailModalVisible: true,
-      notification,
-    });
-  };
 
   const _testBtn = () => {
     return (
@@ -145,9 +139,25 @@ export default function NotificationList() {
       <FlatList
         keyExtractor={(n) => n._id.valueOf().toString()}
         data={notifications}
-        renderItem={NotificationRow}
+        renderItem={({ item }) => (
+          <NotificationRow
+            item={item}
+            setSnoozeModalInfo={setSnoozeModalInfo}
+          ></NotificationRow>
+        )}
         ListEmptyComponent={renderEmptyNotification()}
       ></FlatList>
+
+      <SnoozeModal
+        visible={snoozeModalInfo.snoozeModalVisible}
+        notification={snoozeModalInfo.notification}
+        hideModal={() => {
+          setSnoozeModalInfo({
+            snoozeModalVisible: false,
+            notification: undefined,
+          });
+        }}
+      ></SnoozeModal>
 
       {/* <DetailModal
         visible={detailModalInfo.detailModalVisible}
