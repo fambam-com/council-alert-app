@@ -18,9 +18,6 @@ export default function DetailModal({
 
   useEffect(() => {
     if (!visible && visible !== null) {
-      console.log("id");
-
-      // getNotification(id);
     }
   }, [visible]);
 

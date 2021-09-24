@@ -8,6 +8,7 @@ import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
 import NotificationRow from "./NotificationRow";
 import SnoozeModal from "./SnoozeModal";
+import DetailModal from "./DetailModal";
 
 export default function NotificationList() {
   const { id, notificationToken, user, setState, getNotification } =
@@ -20,6 +21,14 @@ export default function NotificationList() {
     notification: undefined,
   } as {
     snoozeModalVisible: boolean | null;
+    notification?: NotificationDTO;
+  });
+
+  const [detailModalInfo, setDetailModalInfo] = useState({
+    detailModalVisible: null,
+    notification: undefined,
+  } as {
+    detailModalVisible: boolean | null;
     notification?: NotificationDTO;
   });
 
@@ -143,6 +152,7 @@ export default function NotificationList() {
           <NotificationRow
             item={item}
             setSnoozeModalInfo={setSnoozeModalInfo}
+            setDetailModalInfo={setDetailModalInfo}
           ></NotificationRow>
         )}
         ListEmptyComponent={renderEmptyNotification()}
@@ -159,7 +169,7 @@ export default function NotificationList() {
         }}
       ></SnoozeModal>
 
-      {/* <DetailModal
+      <DetailModal
         visible={detailModalInfo.detailModalVisible}
         notification={detailModalInfo.notification}
         hideModal={() => {
@@ -168,7 +178,7 @@ export default function NotificationList() {
             notification: undefined,
           });
         }}
-      ></DetailModal> */}
+      ></DetailModal>
     </View>
   );
 }

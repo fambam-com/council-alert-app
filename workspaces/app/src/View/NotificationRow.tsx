@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 import { StyleSheet, Dimensions, View } from "react-native";
-import { NotificationDTO } from "../../../server/src/util/DBOperator";
-import { ListItem, Text, Button, Badge } from "react-native-elements";
+import { ListItem, Text, Button, Badge, Image } from "react-native-elements";
 
 export default function NotificationRow({
   item: n,
   setSnoozeModalInfo,
+  setDetailModalInfo,
 }: {
-  item: NotificationDTO;
+  item: any;
   setSnoozeModalInfo: any;
+  setDetailModalInfo: any;
 }) {
   const [key, setKey] = useState(n._id.valueOf().toString());
 
@@ -16,6 +17,7 @@ export default function NotificationRow({
   const timeDiffStr = millisecondsToStr(timeDiff);
 
   const isUrgent = n.importance === `urgent`;
+  const isProposal = n._type === `proposal`;
 
   let subject = n.subject || ``;
 
@@ -28,15 +30,13 @@ export default function NotificationRow({
   return (
     <ListItem.Swipeable
       key={key}
-      onPress={() => {}}
+      onPress={() => {
+        setDetailModalInfo({
+          detailModalVisible: true,
+          notification: n,
+        });
+      }}
       bottomDivider
-      // leftContent={
-      //   <Button
-      //     title="Info"
-      //     icon={{ name: "info", color: "white" }}
-      //     buttonStyle={{ minHeight: "100%" }}
-      //   />
-      // }
       rightContent={
         <Button
           onPress={() => {
