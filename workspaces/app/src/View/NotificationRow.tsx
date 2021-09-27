@@ -32,11 +32,27 @@ export default function NotificationRow({
       key={key}
       onPress={() => {
         setDetailModalInfo({
-          detailModalVisible: true,
+          visible: true,
           notification: n,
         });
       }}
       bottomDivider
+      leftContent={
+        <Button
+          title="Info"
+          icon={{ name: "info", color: "white" }}
+          buttonStyle={{ minHeight: "100%" }}
+          onPress={() => {
+            // Workaround: reset/recenter this swipeable row
+            setKey(key + 1);
+
+            setDetailModalInfo({
+              visible: true,
+              notification: n,
+            });
+          }}
+        />
+      }
       rightContent={
         <Button
           onPress={() => {
@@ -44,7 +60,7 @@ export default function NotificationRow({
             setKey(key + 1);
 
             setSnoozeModalInfo({
-              snoozeModalVisible: true,
+              visible: true,
               notification: n,
             });
           }}

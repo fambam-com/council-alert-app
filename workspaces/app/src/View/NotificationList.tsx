@@ -11,24 +11,24 @@ import SnoozeModal from "./SnoozeModal";
 import DetailModal from "./DetailModal";
 
 export default function NotificationList() {
-  const { id, notificationToken, user, setState, getNotification } =
+  const { id, notificationToken, user, setState, getNotification, refreshing } =
     useContext(StateContext);
 
   const appState = useRef(AppState.currentState);
 
   const [snoozeModalInfo, setSnoozeModalInfo] = useState({
-    snoozeModalVisible: null,
+    visible: null,
     notification: undefined,
   } as {
-    snoozeModalVisible: boolean | null;
+    visible: boolean | null;
     notification?: NotificationDTO;
   });
 
   const [detailModalInfo, setDetailModalInfo] = useState({
-    detailModalVisible: null,
+    visible: null,
     notification: undefined,
   } as {
-    detailModalVisible: boolean | null;
+    visible: boolean | null;
     notification?: NotificationDTO;
   });
 
@@ -156,25 +156,27 @@ export default function NotificationList() {
           ></NotificationRow>
         )}
         ListEmptyComponent={renderEmptyNotification()}
+        onRefresh={() => getNotification(id)}
+        refreshing={refreshing || false}
       ></FlatList>
 
       <SnoozeModal
-        visible={snoozeModalInfo.snoozeModalVisible}
+        visible={snoozeModalInfo.visible}
         notification={snoozeModalInfo.notification}
         hideModal={() => {
           setSnoozeModalInfo({
-            snoozeModalVisible: false,
+            visible: false,
             notification: undefined,
           });
         }}
       ></SnoozeModal>
 
       <DetailModal
-        visible={detailModalInfo.detailModalVisible}
+        visible={detailModalInfo.visible}
         notification={detailModalInfo.notification}
         hideModal={() => {
           setDetailModalInfo({
-            detailModalVisible: false,
+            visible: false,
             notification: undefined,
           });
         }}

@@ -19,11 +19,18 @@ export default () => {
   };
 
   const _getNotifications = async (id: string) => {
+    _setState({
+      ...state,
+      refreshing: true,
+    });
+
     const { data: notifications } = await $post(`/user/notification`, {
       id,
     });
 
     _setState({
+      refreshing: false,
+      ...state,
       user: {
         ...state.user,
         notifications: notifications,
