@@ -22,6 +22,8 @@ export const handleApi = async (body: any) => {
   switch (operation) {
     case `meta-data`:
       return await getMetaData();
+    case `setting`:
+      return await getSetting();
     case `user`:
       return await handleUserInfo(body);
     case `user/notification`:
@@ -46,6 +48,10 @@ const getMetaData = async () => {
   const infos = await getAllChaininfo();
 
   return infos;
+};
+
+const getSetting = async () => {
+  return {};
 };
 
 const handleUserInfo = async ({
@@ -251,6 +257,7 @@ const processEvent = (e) => {
     status: `ready`,
     chainName: `kusama`,
     createdTime: Date.parse(e.datetime),
+    updatedTime: Date.parse(e.datetime),
     importance: importance,
     subject,
     content,
