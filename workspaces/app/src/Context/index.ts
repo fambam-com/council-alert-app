@@ -11,6 +11,7 @@ export type STATE_TYPE = {
   user: UserDTO;
   availableChains: Array<ChainInfo>;
   currentChain: ChainInfo;
+  refreshing: false;
 };
 
 export const STATE: STATE_TYPE = {
