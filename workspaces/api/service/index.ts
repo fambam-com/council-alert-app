@@ -20,8 +20,6 @@ const logger = require("pino")();
 export const handleApi = async (body: any) => {
   const { operation } = body || {};
 
-  console.log(body);
-
   switch (operation) {
     case `meta-data`:
       return await getMetaData();
@@ -448,14 +446,14 @@ export const cleanup = async () => {
               ...u.notifications.filter((n) => {
                 if (n.updatedTime) {
                   return (
-                    n.updatedTime > eventCleanupTime.getTime() &&
-                    n.status === `sent`
+                    n.updatedTime > eventCleanupTime.getTime() ||
+                    n.status !== `sent`
                   );
                 }
 
                 return (
-                  n.createdTime > eventCleanupTime.getTime() &&
-                  n.status === `sent`
+                  n.createdTime > eventCleanupTime.getTime() ||
+                  n.status !== `sent`
                 );
               }),
             ],
