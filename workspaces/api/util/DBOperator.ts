@@ -29,7 +29,7 @@ export const getDBInstance = async () => {
   return _dbInstance;
 };
 
-export type NotificationStatus = `ready` | `sent` | `error`;
+export type NotificationStatus = `ready` | `sent` | `error` | `scheduled`;
 
 export type NotificationDTO = {
   _id: ObjectId;
@@ -145,5 +145,59 @@ export const saveEvents = async (events) => {
         ...e,
       });
     }
+  }
+};
+
+export const snoozeNotification = async ({
+  userId,
+  notificationKey, // notification key
+  scheduledTime,
+}: {
+  userId: string;
+  notificationKey: string;
+  scheduledTime: number | null;
+}) => {
+  Logger.info(`snoozeNotification method starts`);
+
+  const db = await getDBInstance();
+
+  const userCollection = db.collection(`User`);
+
+  const user = await userCollection.findOne({ id: userId });
+
+  if (!user) {
+    Logger.info(`User not find: ${userId}`);
+
+    return;
+  }
+
+  Logger.info(`Start to snoozeNotification: ${notificationKey}`);
+
+  try {
+    userCollection.updateOne(
+      {
+        _id: user._id,
+      },
+      {
+        $set: {
+          notifications: user.notifications.map((n) => {
+            if (n._key === notificationKey) {
+              return {
+                ...n,
+                updatedTime: _getUTCNow(),
+                scheduledTime,
+                status: scheduledTime ? `scheduled` : `sent`,
+              };
+            }
+
+            return n;
+          }),
+        },
+      }
+    );
+
+    Logger.info(`snoozeNotification finished`);
+  } catch (error) {
+    Logger.error(error);
   }
 };

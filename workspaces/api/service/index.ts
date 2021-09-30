@@ -9,6 +9,7 @@ import {
   getDBInstance,
   UserDTO,
   NotificationStatus,
+  snoozeNotification,
 } from "../util/DBOperator";
 import axios from "axios";
 import { Collection, ObjectId } from "mongodb";
@@ -19,6 +20,8 @@ const logger = require("pino")();
 export const handleApi = async (body: any) => {
   const { operation } = body || {};
 
+  console.log(body);
+
   switch (operation) {
     case `meta-data`:
       return await getMetaData();
@@ -28,6 +31,8 @@ export const handleApi = async (body: any) => {
       return await handleUserInfo(body);
     case `user/notification`:
       return await getUserNotification(body);
+    case `user/snooze-notification`:
+      return await snoozeNotification(body);
     case `system-admin`:
       logger.info(`call from system-admin`);
 
@@ -440,11 +445,19 @@ export const cleanup = async () => {
         {
           $set: {
             notifications: [
-              ...u.notifications.filter(
-                (n) =>
+              ...u.notifications.filter((n) => {
+                if (n.updatedTime) {
+                  return (
+                    n.updatedTime > eventCleanupTime.getTime() &&
+                    n.status === `sent`
+                  );
+                }
+
+                return (
                   n.createdTime > eventCleanupTime.getTime() &&
                   n.status === `sent`
-              ),
+                );
+              }),
             ],
           },
         }
