@@ -5,7 +5,16 @@ import { ChainInfo } from "../../../server/src/endpoint/index";
 export type STATE_TYPE = {
   setState: (values: any) => void;
   getNotification: (id: string) => Promise<Array<NotificationDTO>>;
-  id: string;
+  snoozeNotification: ({
+    userId,
+    notificationKey,
+    snoozedUntil,
+  }: {
+    userId: string;
+    notificationKey: string;
+    snoozedUntil: number | null;
+  }) => Promise<void>;
+  id: string; // user id
   notificationToken: string;
   loadingMetaData: boolean;
   user: UserDTO;

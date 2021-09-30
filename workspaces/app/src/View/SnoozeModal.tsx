@@ -14,7 +14,7 @@ export default function DetailModal({
   notification?: any;
   hideModal: () => void;
 }) {
-  const { id, getNotification } = useContext(StateContext);
+  const { id, getNotification, snoozeNotification } = useContext(StateContext);
 
   const isSnoozed = n && n.status === `scheduled` && !!n.scheduledTime;
 
@@ -23,6 +23,48 @@ export default function DetailModal({
     }
   }, [visible]);
 
+  const onSnooze = async (option: any) => {
+    const { key } = option;
+
+    let scheduledUntil = null;
+
+    const now = new Date().getTime();
+
+    switch (key) {
+      case `2hrlater`:
+        scheduledUntil = new Date().setTime(now + 2 * 60 * 60 * 1000);
+        break;
+      case `4hrlater`:
+        scheduledUntil = new Date().setTime(now + 4 * 60 * 60 * 1000);
+        break;
+      case `tomorrow10am`:
+        const d = new Date();
+        d.setDate(d.getDate() + 1);
+        d.setHours(10);
+        d.setMinutes(0);
+        d.setMilliseconds(0);
+
+        scheduledUntil = d.getTime();
+        break;
+      case `cancel`:
+        scheduledUntil = null;
+        break;
+
+      default:
+        break;
+    }
+
+    await snoozeNotification({
+      userId: id,
+      notificationKey: n._key,
+      snoozedUntil: scheduledUntil,
+    });
+
+    getNotification(id);
+
+    hideModal();
+  };
+
   const renderOption = (option: any) => {
     const { name, icon } = option;
 
@@ -30,18 +72,7 @@ export default function DetailModal({
       <TouchableHighlight
         activeOpacity={0.6}
         underlayColor="#DDDDDD"
-        onPress={() =>
-          Alert.alert("info", "Message", [
-            {
-              text: "ok",
-              onPress: () => {
-                hideModal();
-
-                getNotification(id);
-              },
-            },
-          ])
-        }
+        onPress={() => onSnooze(option)}
       >
         <View
           style={{
@@ -68,22 +99,26 @@ export default function DetailModal({
       >
         <View>
           {renderOption({
+            key: `2hrlater`,
             name: `2 hours later`,
             icon: `snooze`,
           })}
 
           {renderOption({
+            key: `4hrlater`,
             name: `4 hours later`,
             icon: `snooze`,
           })}
 
           {renderOption({
-            name: `Tomorrow Morning`,
+            key: `tomorrow10am`,
+            name: `Tomorrow 10am`,
             icon: `snooze`,
           })}
 
           {isSnoozed &&
             renderOption({
+              key: `cancel`,
               name: `Cancel Snooze`,
               icon: `event-busy`,
             })}

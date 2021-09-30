@@ -60,7 +60,7 @@ export default function DetailModal({
     }
 
     const timeDiff = n.scheduledTime - new Date().getTime();
-    const timeDiffStr = millisecondsToStr(timeDiff);
+    const timeDiffStr = millisecondsToStr(timeDiff, true);
 
     return (
       <View style={{ backgroundColor: `black`, alignItems: `center` }}>

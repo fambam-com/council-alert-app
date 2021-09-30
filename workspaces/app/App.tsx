@@ -43,12 +43,29 @@ export default () => {
     return notifications;
   };
 
+  const _snoozeNotifications = async ({
+    userId,
+    notificationKey,
+    snoozedUntil,
+  }: {
+    userId: string;
+    notificationKey: string;
+    snoozedUntil: number | null;
+  }) => {
+    await $post(`/user/snooze-notification`, {
+      userId,
+      notificationKey,
+      scheduledTime: snoozedUntil,
+    });
+  };
+
   return (
     <StateContext.Provider
       value={{
         ...state,
         setState: _setState,
         getNotification: _getNotifications,
+        snoozeNotification: _snoozeNotifications,
       }}
     >
       <App />
