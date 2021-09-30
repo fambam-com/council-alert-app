@@ -11,10 +11,12 @@ export default function DetailModal({
   hideModal,
 }: {
   visible: boolean | null;
-  notification?: NotificationDTO;
+  notification?: any;
   hideModal: () => void;
 }) {
   const { id, getNotification } = useContext(StateContext);
+
+  const isSnoozed = n && n.status === `scheduled` && !!n.scheduledTime;
 
   useEffect(() => {
     if (!visible && visible !== null) {
@@ -43,7 +45,6 @@ export default function DetailModal({
       >
         <View
           style={{
-            width: 100,
             height: 70,
             alignItems: `center`,
             justifyContent: `center`,
@@ -51,7 +52,7 @@ export default function DetailModal({
             margin: 7,
           }}
         >
-          <Icon name={icon}></Icon>
+          <Icon name={icon} style={{ marginBottom: 5 }}></Icon>
           <Text>{name}</Text>
         </View>
       </TouchableHighlight>
@@ -63,21 +64,29 @@ export default function DetailModal({
       <Overlay
         isVisible={!!visible}
         onBackdropPress={hideModal}
-        overlayStyle={{ width: `100%`, maxWidth: 250 }}
+        overlayStyle={{ width: `100%`, maxWidth: 200 }}
       >
-        <View style={{ flexDirection: `row`, flexWrap: `wrap` }}>
+        <View>
           {renderOption({
             name: `2 hours later`,
-            icon: `rowing`,
+            icon: `snooze`,
           })}
+
           {renderOption({
             name: `4 hours later`,
-            icon: `rowing`,
+            icon: `snooze`,
           })}
+
           {renderOption({
-            name: `4 hours later`,
-            icon: `rowing`,
+            name: `Tomorrow Morning`,
+            icon: `snooze`,
           })}
+
+          {isSnoozed &&
+            renderOption({
+              name: `Cancel Snooze`,
+              icon: `event-busy`,
+            })}
         </View>
       </Overlay>
     </View>

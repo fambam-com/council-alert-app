@@ -4,6 +4,7 @@ import { Divider, Overlay, Text } from "react-native-elements";
 import StateContext from "../Context";
 import { $post } from "../Util/Request";
 import * as Linking from "expo-linking";
+import { millisecondsToStr } from "../Util/Index";
 
 export default function DetailModal({
   visible,
@@ -20,6 +21,7 @@ export default function DetailModal({
 
   const isProposal = n._type === `proposal`;
   const isUrgent = n.importance === `urgent`;
+  const isSnoozed = n.status === `scheduled` && !!n.scheduledTime;
 
   const onLinkPress = (url: string) => {
     Linking.openURL(url);
@@ -52,6 +54,23 @@ export default function DetailModal({
     return <View></View>;
   };
 
+  const renderSnoozeInfo = () => {
+    if (!isSnoozed) {
+      return undefined;
+    }
+
+    const timeDiff = n.scheduledTime - new Date().getTime();
+    const timeDiffStr = millisecondsToStr(timeDiff);
+
+    return (
+      <View style={{ backgroundColor: `black`, alignItems: `center` }}>
+        <Text style={{ color: `white`, fontWeight: `bold` }}>
+          {`Snoozed until ${timeDiffStr} later`}
+        </Text>
+      </View>
+    );
+  };
+
   const renderContent = () => {
     const links =
       n.link ||
@@ -69,6 +88,7 @@ export default function DetailModal({
     if (isProposal) {
       return (
         <View>
+          {renderSnoozeInfo()}
           <Text style={{ marginBottom: 10, marginTop: 10 }}>
             Please click the link to view detail
           </Text>
@@ -84,6 +104,9 @@ export default function DetailModal({
             <Text style={{ color: `white`, fontWeight: `bold` }}>URGENT</Text>
           </View>
         )}
+
+        {renderSnoozeInfo()}
+
         <View style={{ marginBottom: 10, marginTop: 10 }}>
           <Text>{n.content}</Text>
         </View>
