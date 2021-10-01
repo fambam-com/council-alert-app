@@ -60,12 +60,15 @@ export default function DetailModal({
     }
 
     const timeDiff = n.scheduledTime - new Date().getTime();
+
     const timeDiffStr = millisecondsToStr(timeDiff, true);
 
     return (
       <View style={{ backgroundColor: `black`, alignItems: `center` }}>
         <Text style={{ color: `white`, fontWeight: `bold` }}>
-          {`Snoozed until ${timeDiffStr} later`}
+          {timeDiff > 0
+            ? `Snoozed until ${timeDiffStr} later`
+            : `Sending notification...`}
         </Text>
       </View>
     );
