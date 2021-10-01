@@ -363,6 +363,7 @@ const sendNotification = async (
     priority: n.importance === `urgent` ? `high` : `default`,
   }));
 
+  // DOC: https://github.com/expo/expo-server-sdk-node
   // The Expo push notification service accepts batches of notifications so
   // that you don't need to send 1000 requests to send 1000 notifications. We
   // recommend you batch your notifications to reduce the number of requests
@@ -375,12 +376,21 @@ const sendNotification = async (
     // different strategies you could use. A simple one is to send one chunk at a
     // time, which nicely spreads the load out over time:
     for (let chunk of chunks) {
-      let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-      tickets.push(...ticketChunk);
-      // NOTE: If a ticket contains an error code in ticket.details.error, you
-      // must handle it appropriately. The error codes are listed in the Expo
-      // documentation:
-      // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+      try {
+        console.log(`Sending notifications...`);
+
+        let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
+
+        console.log(`Notifications sent`);
+
+        tickets.push(...ticketChunk);
+        // NOTE: If a ticket contains an error code in ticket.details.error, you
+        // must handle it appropriately. The error codes are listed in the Expo
+        // documentation:
+        // https://docs.expo.io/push-notifications/sending-notifications/#individual-errors
+      } catch (error) {
+        console.error(error);
+      }
     }
   })();
 };
