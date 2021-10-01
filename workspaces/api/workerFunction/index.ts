@@ -1,5 +1,5 @@
 import { AzureFunction, Context } from "@azure/functions";
-import { workerDo, cleanup } from "../service";
+import { workerDo, cleanup, handleScheduledNotification } from "../service";
 const logger = require("pino")();
 
 const timerTrigger: AzureFunction = async function (
@@ -14,6 +14,7 @@ const timerTrigger: AzureFunction = async function (
     logger.info(`processing main worker logic`);
 
     await workerDo();
+    await handleScheduledNotification();
 
     logger.info(`main worker logic finished`);
   } catch (error) {
