@@ -14,6 +14,7 @@ import {
 import axios from "axios";
 import { Collection, ObjectId } from "mongodb";
 import { Expo, ExpoPushMessage } from "expo-server-sdk";
+import { _getUTCNow } from "../util/Logger";
 
 const logger = require("pino")();
 
@@ -294,6 +295,8 @@ const senderDo = async () => {
   users.forEach(async (u) => {
     let success = false;
 
+    const utcNow = _getUTCNow();
+
     // Filter out events
     const _events = events.filter(
       (e) => !Array.isArray(e.userId) || e.userId.includes(u.id)
@@ -318,6 +321,7 @@ const senderDo = async () => {
             ..._events.map((n) => ({
               ...n,
               status: (success ? `sent` : `error`) as NotificationStatus,
+              updatedTime: utcNow,
             })),
             ...(u.notifications as Array<NotificationDTO>),
           ],
@@ -463,5 +467,66 @@ export const cleanup = async () => {
     } catch (error) {
       logger.error(error);
     }
+  });
+};
+
+export const handleScheduledNotification = async () => {
+  const db = await getDBInstance();
+
+  const userCollection = db.collection(`User`) as Collection<UserDTO>;
+
+  const userCursor = userCollection
+    .find({})
+    .project({ notificationToken: 1, _id: 1, notifications: 1, id: 1 });
+
+  const users = await userCursor.toArray();
+
+  users.forEach(async (u) => {
+    let success = false;
+
+    const utcNow = _getUTCNow();
+
+    const scheduledNotifications = (u.notifications || []).filter(
+      (n) =>
+        n.status === `scheduled` && n.scheduledTime && n.scheduledTime < utcNow
+    );
+
+    if (!scheduledNotifications.length) {
+      return;
+    }
+
+    try {
+      await sendNotification(
+        u.notificationToken as string,
+        scheduledNotifications
+      );
+
+      success = true;
+    } catch (error) {
+      success = false;
+    }
+
+    const nKeys = scheduledNotifications.map((n) => n._key);
+
+    userCollection.updateOne(
+      {
+        _id: u._id as ObjectId,
+      },
+      {
+        $set: {
+          notifications: u.notifications.map((n) => {
+            if (nKeys.includes(n._key)) {
+              return {
+                ...n,
+                status: (success ? `sent` : `error`) as NotificationStatus,
+                updatedTime: utcNow,
+              };
+            }
+
+            return n;
+          }),
+        },
+      }
+    );
   });
 };
