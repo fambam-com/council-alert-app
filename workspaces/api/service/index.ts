@@ -121,6 +121,10 @@ interface ProposalEvent {
   method: string;
   data: Array<any>;
   datetime: string;
+  proposal_id: number;
+  title: string;
+  content: string;
+  polkassembly_link: string;
 }
 
 export const workerDo = async () => {
@@ -177,35 +181,50 @@ export const processData = async (
 };
 
 const getProposalEvent = (e: ProposalEvent) => {
-  const { block_number, data, method } = e;
+  const {
+    block_number,
+    data,
+    method,
+    proposal_id,
+    title,
+    content,
+    polkassembly_link,
+  } = e;
 
-  let proposalHash = data[0];
+  // let proposalHash = data[0];
 
-  if (method.toLowerCase() === `proposed`) {
-    if (Array.isArray(data)) {
-      proposalHash = data[2];
-    } else if (typeof data === "string") {
-      try {
-        proposalHash = JSON.parse(data)[2];
-      } catch (error) {
-        logger.error(
-          `proposed proposal event is not an array. Error happened when parsing`
-        );
+  // if (method.toLowerCase() === `proposed`) {
+  //   if (Array.isArray(data)) {
+  //     proposalHash = data[2];
+  //   } else if (typeof data === "string") {
+  //     try {
+  //       proposalHash = JSON.parse(data)[2];
+  //     } catch (error) {
+  //       logger.error(
+  //         `proposed proposal event is not an array. Error happened when parsing`
+  //       );
 
-        proposalHash = data[2];
-      }
-    }
-  }
+  //       proposalHash = data[2];
+  //     }
+  //   }
+  // }
 
-  if (method.toLowerCase() === `voted`) {
-    proposalHash = data[1];
-  }
+  // if (method.toLowerCase() === `voted`) {
+  //   proposalHash = data[1];
+  // }
 
   return {
     ...e,
     _type: `proposal`,
-    _key: `${block_number}-${proposalHash}`,
-    _proposalHash: proposalHash,
+    _key: `${block_number}-${proposal_id}`,
+    title,
+    content,
+    link: [
+      {
+        name: `Polkassembly`,
+        url: polkassembly_link,
+      },
+    ],
   };
 };
 
@@ -246,7 +265,7 @@ const processEvent = (e) => {
 
   // TODO: proposal
   if (!content && e._type === `proposal`) {
-    content = `Proposal ${e.method}: ${e._proposalHash}`;
+    content = e.title || e.polkassembly_link;
     subject = `Proposal Action`;
   }
 
@@ -258,6 +277,7 @@ const processEvent = (e) => {
 
   return {
     ...e,
+    detailContent: e.content,
     status: `ready`,
     chainName: `kusama`,
     createdTime: Date.parse(e.datetime),
