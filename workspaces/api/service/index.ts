@@ -526,14 +526,20 @@ export const handleScheduledNotification = async () => {
     }
 
     try {
+      logger.info(`sending scheduled notifications to ${u.deviceName}`);
+
       await sendNotification(
         u.notificationToken as string,
         scheduledNotifications
       );
 
       success = true;
+
+      logger.info(`scheduled notifications sent`);
     } catch (error) {
       success = false;
+
+      logger.info(`scheduled notifications error`);
     }
 
     const nKeys = scheduledNotifications.map((n) => n._key);
