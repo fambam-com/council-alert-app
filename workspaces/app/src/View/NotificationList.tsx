@@ -114,7 +114,7 @@ export default function NotificationList() {
         }}
       >
         <View>
-          <Text>Only display notifications within 7 days</Text>
+          <Text>Only display notifications within 30 days</Text>
         </View>
 
         <View

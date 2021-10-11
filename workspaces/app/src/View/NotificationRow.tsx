@@ -23,6 +23,10 @@ export default function NotificationRow({
 
   let subject = n.subject || ``;
 
+  if (isProposal) {
+    subject = `Proposal ${n.method}`;
+  }
+
   if (isUrgent) {
     subject = subject?.replace("(URGENT)", "");
   }

@@ -93,7 +93,7 @@ export default function DetailModal({
         <View>
           {renderSnoozeInfo()}
           <Text style={{ marginBottom: 10, marginTop: 10 }}>
-            Please click the link to view detail
+            {n.content || `Please click the link to view detail`}
           </Text>
           {renderLinks(links)}
         </View>
