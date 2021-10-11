@@ -468,9 +468,9 @@ export const cleanup = async () => {
 
   const activeUsers = await activeUsersCusor.toArray();
 
-  activeUsers.forEach((u) => {
+  activeUsers.forEach(async (u) => {
     try {
-      userCollection.updateOne(
+      await userCollection.updateOne(
         {
           _id: u._id as ObjectId,
         },
@@ -503,7 +503,7 @@ export const cleanup = async () => {
 export const handleScheduledNotification = async () => {
   const db = await getDBInstance();
 
-  const userCollection = db.collection(`User`) as Collection<UserDTO>;
+  const userCollection = db.collection(`User`);
 
   const userCursor = userCollection
     .find({})
@@ -526,7 +526,7 @@ export const handleScheduledNotification = async () => {
     }
 
     try {
-      logger.info(`sending scheduled notifications to ${u.deviceName}`);
+      logger.info(`sending scheduled notifications to user.id: ${u.id}`);
 
       await sendNotification(
         u.notificationToken as string,
@@ -542,27 +542,20 @@ export const handleScheduledNotification = async () => {
       logger.info(`scheduled notifications error`);
     }
 
-    const nKeys = scheduledNotifications.map((n) => n._key);
+    try {
+      scheduledNotifications.forEach(async (n) => {
+        logger.info(`updating notification: ${n._key}`);
 
-    userCollection.updateOne(
-      {
-        _id: u._id as ObjectId,
-      },
-      {
-        $set: {
-          notifications: u.notifications.map((n) => {
-            if (nKeys.includes(n._key)) {
-              return {
-                ...n,
-                status: (success ? `sent` : `error`) as NotificationStatus,
-                updatedTime: utcNow,
-              };
-            }
+        await snoozeNotification({
+          userId: u.id,
+          notificationKey: n._key,
+          scheduledTime: null,
+        });
 
-            return n;
-          }),
-        },
-      }
-    );
+        logger.info(`notification: ${n._key} updated`);
+      });
+    } catch (error) {
+      logger.info(`update scheduled notifications error`);
+    }
   });
 };

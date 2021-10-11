@@ -14,7 +14,6 @@ const timerTrigger: AzureFunction = async function (
     logger.info(`processing main worker logic`);
 
     await workerDo();
-    await handleScheduledNotification();
 
     logger.info(`main worker logic finished`);
   } catch (error) {
@@ -27,6 +26,16 @@ const timerTrigger: AzureFunction = async function (
     await cleanup();
 
     logger.info(`cleanup finished`);
+  } catch (error) {
+    logger.error(error);
+  }
+
+  try {
+    logger.info(`handleScheduledNotification`);
+
+    await handleScheduledNotification();
+
+    logger.info(`handleScheduledNotification finished`);
   } catch (error) {
     logger.error(error);
   }
