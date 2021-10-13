@@ -1,6 +1,6 @@
 {
   "name": "council-alert-app",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "description": "Work on https://kusama.polkassembly.io/bounty/4",
   "main": "index.ts",
