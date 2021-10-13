@@ -417,7 +417,7 @@ const sendNotification = async (
 
 export const cleanup = async () => {
   const CLEANUP_SETTING = {
-    EventCleanupDays: 30,
+    EventCleanupDays: 35,
     InactiveUserCleanupDays: 30,
   };
 
