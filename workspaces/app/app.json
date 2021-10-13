@@ -2,7 +2,7 @@
   "expo": {
     "name": "Council Alert App",
     "slug": "council-alert-app",
-    "version": "1.0.2",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -16,7 +16,7 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "bundleIdentifier": "com.meta-dojo.council-alert-app",
-      "buildNumber": "1.0.3"
+      "buildNumber": "1.1.0"
     },
     "android": {
       "package": "com.meta_dojo.council_alert_app",
