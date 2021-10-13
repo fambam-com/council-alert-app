@@ -67,7 +67,7 @@ export default function DetailModal({
       <View style={{ backgroundColor: `black`, alignItems: `center` }}>
         <Text style={{ color: `white`, fontWeight: `bold` }}>
           {timeDiff > 0
-            ? `Snoozed until ${timeDiffStr} later`
+            ? `Snoozed until ${timeDiffStr}`
             : `Sending notification...`}
         </Text>
       </View>

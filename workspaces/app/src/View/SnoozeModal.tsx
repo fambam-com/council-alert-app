@@ -100,13 +100,13 @@ export default function DetailModal({
         <View>
           {renderOption({
             key: `2hrlater`,
-            name: `2 hours later`,
+            name: `2 hours`,
             icon: `snooze`,
           })}
 
           {renderOption({
             key: `4hrlater`,
-            name: `4 hours later`,
+            name: `4 hours`,
             icon: `snooze`,
           })}
 
