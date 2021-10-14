@@ -10,6 +10,8 @@ lerna-debug.log*
 Local
 local.settings.json
 
+localtest
+
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
