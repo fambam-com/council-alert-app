@@ -36,4 +36,5 @@ Contact: allan.liang@metadojo.io
   - result: 
   - ![1633921851(1)](https://user-images.githubusercontent.com/48347986/136728118-efbee936-fe2d-4941-ad76-16499f2c73b5.jpg)
 * Swipe right to view detail, including clickable external link. Swipe left to snooze.
-  - ![info](https://user-images.githubusercontent.com/48347986/136725871-4682688c-1edb-4217-aff9-bf4eb572b82c.gif)![snooze](https://user-images.githubusercontent.com/48347986/136726382-c619891d-a655-4d52-9637-01782d7987dc.gif)
+  - ![info](https://user-images.githubusercontent.com/48347986/136725871-4682688c-1edb-4217-aff9-bf4eb572b82c.gif)![ezgif com-gif-maker](https://user-images.githubusercontent.com/48347986/137231374-95cadf40-430c-4f4b-8ecf-3b484cea5f17.gif)
+
