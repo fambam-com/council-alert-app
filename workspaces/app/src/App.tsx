@@ -48,39 +48,37 @@ export default function App() {
   const getNotificationToken = async () => {
     // TESTING DATA
     // return `ExponentPushToken[oZI8lHf70IEgG-u1T31]`;
+    if (!Constants.isDevice) {
+      alert("Must use physical device for Push Notifications");
+      return;
+    }
 
-    let notificationToken = await AsyncStorage.getItem("notificationToken");
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
 
-    if (!notificationToken) {
-      if (Constants.isDevice) {
-        const { status: existingStatus } =
-          await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
 
-        let finalStatus = existingStatus;
+    if (existingStatus !== "granted") {
+      const { status } = await Notifications.requestPermissionsAsync();
 
-        if (existingStatus !== "granted") {
-          const { status } = await Notifications.requestPermissionsAsync();
-          finalStatus = status;
-        }
+      finalStatus = status;
+    }
 
-        if (finalStatus !== "granted") {
-          alert("Failed to get push token for push notification!");
-          return;
-        }
+    if (finalStatus !== "granted") {
+      alert("Please enable notification for better experience");
+      return;
+    }
 
-        notificationToken = (await Notifications.getExpoPushTokenAsync()).data;
-      } else {
-        alert("Must use physical device for Push Notifications");
-      }
+    const notificationToken = (await Notifications.getExpoPushTokenAsync())
+      .data;
 
-      if (Platform.OS === "android") {
-        Notifications.setNotificationChannelAsync("default", {
-          name: "default",
-          importance: Notifications.AndroidImportance.MAX,
-          vibrationPattern: [0, 250, 250, 250],
-          lightColor: "#FF231F7C",
-        });
-      }
+    if (Platform.OS === "android") {
+      Notifications.setNotificationChannelAsync("default", {
+        name: "default",
+        importance: Notifications.AndroidImportance.MAX,
+        vibrationPattern: [0, 250, 250, 250],
+        lightColor: "#FF231F7C",
+      });
     }
 
     return notificationToken;
@@ -102,13 +100,12 @@ export default function App() {
     (async () => {
       const id = await getId();
 
-      const token = await getNotificationToken();
+      let token = await getNotificationToken();
 
       const infos = await getMetaData();
 
       if (!token) {
-        alert("Notification is required for this app!");
-        return;
+        token = `NA`;
       }
 
       // This listener is fired whenever a notification is received while the app is foregrounded
