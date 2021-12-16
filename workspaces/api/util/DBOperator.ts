@@ -149,6 +149,7 @@ export const saveEvents = async (events) => {
         duplicateEvent.title !== e.title ||
         duplicateEvent.content !== e.content
       ) {
+        // update event
         eventCollection.updateOne(
           {
             _key: e._key,
@@ -160,6 +161,44 @@ export const saveEvents = async (events) => {
             },
           }
         );
+
+        // update event in user table
+        const userCollection = db.collection(`User`) as Collection<UserDTO>;
+
+        const userCursor = userCollection
+          .find({})
+          .project({ notificationToken: 1, _id: 1, notifications: 1, id: 1 });
+
+        const users = await userCursor.toArray();
+
+        users.forEach((u) => {
+          if (!u.notifications.find((n) => n._key === e._key)) {
+            return;
+          }
+
+          const utcNow = _getUTCNow();
+
+          userCollection.updateOne(
+            {
+              _id: u._id as ObjectId,
+            },
+            {
+              $set: {
+                notifications: [
+                  ...u.notifications.map((n) =>
+                    n._key === e._key
+                      ? {
+                          ...n,
+                          title: e.title,
+                          content: e.content,
+                        }
+                      : n
+                  ),
+                ],
+              },
+            }
+          );
+        });
       }
     }
   }
