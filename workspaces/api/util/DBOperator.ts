@@ -144,6 +144,23 @@ export const saveEvents = async (events) => {
       await eventCollection.insertOne({
         ...e,
       });
+    } else {
+      if (
+        duplicateEvent.title !== e.title ||
+        duplicateEvent.content !== e.content
+      ) {
+        eventCollection.updateOne(
+          {
+            _key: e._key,
+          },
+          {
+            $set: {
+              title: e.title,
+              content: e.content,
+            },
+          }
+        );
+      }
     }
   }
 };
